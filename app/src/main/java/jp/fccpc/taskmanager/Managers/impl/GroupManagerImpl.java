@@ -99,7 +99,7 @@ public class GroupManagerImpl extends ManagerImpl implements GroupManager {
     @Override
     public void searchWithGroupName(String groupName, final GroupListCallback callback) {
         if (isOnline()) {
-            ServerConnector sc = new ServerConnector(new ServerConnector.ServerConnectorDelegate() {
+            ServerConnector sc = new ServerConnector(context, new ServerConnector.ServerConnectorDelegate() {
                 @Override
                 public void recieveResponse(String responseStr) {
                     List<Group> groupList = JsonParser.groups(responseStr);
@@ -135,7 +135,7 @@ public class GroupManagerImpl extends ManagerImpl implements GroupManager {
 
                     User u = userList.get(0);
 
-                    ServerConnector sc = new ServerConnector(new ServerConnector.ServerConnectorDelegate() {
+                    ServerConnector sc = new ServerConnector(context, new ServerConnector.ServerConnectorDelegate() {
                         @Override
                         public void recieveResponse(String responseStr) {
                             List<Group> groupList = JsonParser.groups(responseStr);

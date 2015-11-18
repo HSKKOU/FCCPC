@@ -118,6 +118,11 @@ public class TaskManagerImpl extends ManagerImpl implements TaskManager {
     }
 
     @Override
+    public void getBoardItems(Long taskId, int num, BoardItemListCallback callback) {
+        // TODO: implementation
+    }
+
+    @Override
     public void create(Task task, final Callback callback) {
         if (isOnline()) {
             ServerConnector sc = new ServerConnector(context, new ServerConnector.ServerConnectorDelegate() {
