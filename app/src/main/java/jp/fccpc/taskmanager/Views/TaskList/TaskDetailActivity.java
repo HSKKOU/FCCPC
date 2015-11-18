@@ -33,7 +33,6 @@ import jp.fccpc.taskmanager.Values.User;
  * Created by tm on 2015/11/11.
  */
 public class TaskDetailActivity extends Activity {
-    // Todo: add board item class
     private TextView mTitle, mDeadline, mReminderTime, mContent, mFinishedUsers;
     private EditText mAddBoardItemText;
 
@@ -133,45 +132,45 @@ public class TaskDetailActivity extends Activity {
         mAddBoardItemButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-            if(!mAddBoardItemText.getText().toString().equals("")){
-                // get user info
-                // correct implementation ???
-                final Long[] userId = new Long[1];
-                final String[] userName = new String[1];
-                App.get().getUserManager().get(null, new UserManager.UserCallback() {
-                    @Override
-                    public void callback(User user) {
-                    if (user != null) {
-                        userId[0] = user.getUserId();
-                        userName[0] = user.getName();
+                if(!mAddBoardItemText.getText().toString().equals("")){
+                    mAddBoardItemButton.setEnabled(false);
+                    // get user info
+                    App.get().getUserManager().get(null, new UserManager.UserCallback() {
+                        @Override
+                        public void callback(User user) {
+                            if (user != null) {
+                                Long userId = user.getUserId();
+                                String userName = user.getName();
 
-                        // add boarditem
-                        BoardItem item = new BoardItem(null, userId[0], userName[0], new Date().getTime(), mAddBoardItemText.getText().toString());
-                        App.get().getTaskManager().createBoardItem(taskId, item, new TaskManager.Callback() {
-                            @Override
-                            public void callback(boolean success) {
-                                if (success) {
-                                } else {
-                                    // Todo: handle error
-                                }
+                                // add boarditem
+                                BoardItem item = new BoardItem(null, userId, userName, new Date().getTime(), mAddBoardItemText.getText().toString());
+                                App.get().getTaskManager().createBoardItem(taskId, item, new TaskManager.Callback() {
+                                    @Override
+                                    public void callback(boolean success) {
+                                        if (success) {
+                                        } else {
+                                            // Todo: handle error
+                                        }
+                                        mAddBoardItemButton.setEnabled(true);
+                                    }
+                                });
+
+                            } else {
+                                mAddBoardItemButton.setEnabled(true);
+                                // Todo: handle error
                             }
-                        });
+                        }
+                    });
 
-                    } else {
-                        // Todo: handle error
-                    }
-                    }
-                });
+                }
 
-            }
+                mAddBoardItemText.getEditableText().clear();
+                // キーボードを隠す
+                ((InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(mTitle.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+                mTitle.requestFocus();
 
-            mAddBoardItemText.getEditableText().clear();
-            // キーボードを隠す
-            ((InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(mTitle.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
-            mTitle.requestFocus();
-
-            // reload list
-            loadLatestBoardItems();
+                // reload list
+                loadLatestBoardItems();
             }
         });
 
@@ -234,7 +233,12 @@ public class TaskDetailActivity extends Activity {
         return false;
     }
 
+    private boolean isLoadingBoardItems = false;
     private void loadLatestBoardItems(){
+        if(isLoadingBoardItems) return;
+
+        isLoadingBoardItems = true;
+
         // progressbar を表示
         mBoardItemList.addHeaderView(mHeader);
         App.get().getTaskManager().getBoardItems(taskId, BOARD_ITEM_NUM_SKIP, new TaskManager.BoardItemListCallback() {
@@ -270,6 +274,8 @@ public class TaskDetailActivity extends Activity {
                 mBoardItemList.removeHeaderView(mHeader);
                 // 先頭へ移動
                 mBoardItemList.setSelection(0);
+
+                isLoadingBoardItems = false;
             }
         });
 
@@ -277,6 +283,9 @@ public class TaskDetailActivity extends Activity {
 
     // Todo : fix int/long
     private void loadOlderBoardItems(){
+        if(isLoadingBoardItems) return;
+
+        isLoadingBoardItems = true;
 
         Long end = boardItems.get(boardItems.size()-1).getNumber() -1;
         Log.d("loadOlderBoardItems", "" + end);
@@ -301,6 +310,8 @@ public class TaskDetailActivity extends Activity {
                 mBoardItemList.removeFooterView(mFooter);
                 // 末尾へ移動
                 mBoardItemList.setSelection(boardItems.size()-1);
+
+                isLoadingBoardItems = false;
             }
         });
     }

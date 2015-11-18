@@ -246,6 +246,7 @@ public class TaskManagerMock implements TaskManager{
         Long newBoardNumber = (long)entry.boardItems.size() + 1;
         BoardItem item = new BoardItem(newBoardNumber, boardItem.getUserId(), boardItem.getUserName(), boardItem.getCreatedAt(), boardItem.getContent());
         entry.boardItems.add(item);
+        callback.callback(true);
     }
 
     @Override
