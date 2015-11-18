@@ -14,6 +14,8 @@ import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import jp.fccpc.taskmanager.SQLite.Controller.UserDataController;
+
 /**
  * Created by hskk1120551 on 2015/10/16.
  */
@@ -38,12 +40,19 @@ public class ServerConnector extends AsyncTask<String, Integer, String> {
     private static String TAG = "ServerConnector";
     public static final String CHAR_SET = "UTF-8";
 
-    private String token = "";
-    public void setToken(String token) {this.token = token;}
+    private String eTag = "";
+
+    private Context context;
 
     private ServerConnectorDelegate delegate;
 
+    // for Debug
+    public ServerConnector(ServerConnectorDelegate delegate) {
+        this.delegate = delegate;
+    }
+
     public ServerConnector(Context context, ServerConnectorDelegate delegate) {
+        this.context = context;
         this.delegate = delegate;
     }
 
@@ -116,25 +125,30 @@ public class ServerConnector extends AsyncTask<String, Integer, String> {
     private void setDefaultHeader(HttpURLConnection con) {
         // set header's property
         con.setRequestProperty("Accept-Language", CHAR_SET);
-        if(!"".equals(this.token)) {
-            con.setRequestProperty("Authorization", "Token " + this.token);
-        }
+        String token = this.getTokenFromSQL();
+        if(token != null && !"".equals(token)) { con.setRequestProperty("Authorization", "Token " + token); }
+        if(this.eTag != null && !"".equals(this.eTag)) { con.setRequestProperty("If-Match", "ETag " + this.eTag); }
     }
 
     private HttpURLConnection connectServer(URL _url) throws IOException {
         return (HttpURLConnection) _url.openConnection();
     }
 
+    private String getTokenFromSQL() {
+        UserDataController udc = new UserDataController(this.context);
+        return udc.getToken();
+    }
+
     @Override
     protected String doInBackground(String... params) {
-        Log.d(TAG, "doInBackground");
-
         String endPointStr = params[0];
         String methodStr = params[1];
         String paramsStr = params[2];
         String eTag = params[3];
 
         Log.d(TAG, "endpoint: " + endPointStr + ", method: " + methodStr + ", params: " + paramsStr + ", eTag: " + eTag);
+
+        this.eTag = eTag;
 
         try {
             String urlStr = API_BASE_URL + endPointStr;
@@ -162,7 +176,7 @@ public class ServerConnector extends AsyncTask<String, Integer, String> {
 
     @Override
     protected void onPostExecute(String s) {
-        if (s != null) Log.d(TAG, s);
+        Log.d(TAG, s);
         this.delegate.recieveResponse(s);
     }
 }
