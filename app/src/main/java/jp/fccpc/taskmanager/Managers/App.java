@@ -24,6 +24,7 @@ public class App extends Application {
 //        taskManager = new TaskManagerImpl(context);
 //        userManager = new UserManagerImpl(context);
 //        groupManager = new GroupManagerImpl(context);
+//        authManager = new AuthManagerImpl(context);
         taskManager = new TaskManagerMock();
         userManager = new UserManagerMock();
         groupManager = new GroupManagerMock(userManager);
@@ -32,6 +33,7 @@ public class App extends Application {
     GroupManager groupManager;
     TaskManager taskManager;
     UserManager userManager;
+    AuthManager authManager;
 
     public GroupManager getGroupManager() {
         return groupManager;
@@ -43,5 +45,9 @@ public class App extends Application {
 
     public UserManager getUserManager() {
         return userManager;
+    }
+
+    public AuthManager getAuthManager() {
+        return authManager;
     }
 }
