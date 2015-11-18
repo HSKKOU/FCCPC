@@ -35,16 +35,18 @@ public class UserAccountFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_user_account, container, false);
 
         // Todo: fix to be able to change username/email/password
-        mUserEmailText = (TextView) rootView.findViewById(R.id.user_name);
-        mUserNameText = (TextView) rootView.findViewById(R.id.user_email);
 
-        // TODO: fix to get my account
-        App.get().getUserManager().get(1L, new UserManager.UserCallback() {
+        mUserEmailText = (TextView) rootView.findViewById(R.id.user_email);
+        mUserNameText = (TextView) rootView.findViewById(R.id.user_name);
+
+        App.get().getUserManager().get(null, new UserManager.UserCallback() {
             @Override
             public void callback(User user) {
                 if (user != null){
                     mUserNameText.setText(user.getName());
                     mUserEmailText.setText(user.getEmailAddress());
+                } else {
+                    // Todo: handle error
                 }
             }
         });

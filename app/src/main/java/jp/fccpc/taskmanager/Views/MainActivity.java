@@ -134,15 +134,14 @@ public class MainActivity extends AppCompatActivity
      */
     @Override
     public void onItemSelected(int position){
-        // show menubar
-        mMenu.findItem(R.id.menu_group_detail).setVisible(true);
-        // change Toolbar name
+        // change Toolbar name and show menubar
         final int i = position;
         App.get().getGroupManager().getList(new GroupManager.GroupListCallback() {
             @Override
             public void callback(List<Group> groupList) {
                 mToolbar.setTitle(groupList.get(i).getName());
                 mCurrentGroupId = groupList.get(i).getGroupId();
+                mMenu.findItem(R.id.menu_group_detail).setVisible(true);
             }
         });
 
