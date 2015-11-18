@@ -3,21 +3,17 @@ package jp.fccpc.taskmanager.Views.GroupList;
 import android.content.Context;
 import android.graphics.Color;
 import android.text.Html;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-import com.google.common.base.Function;
-
 import java.util.List;
 
 import jp.fccpc.taskmanager.Managers.App;
 import jp.fccpc.taskmanager.Managers.UserManager;
 import jp.fccpc.taskmanager.R;
-import jp.fccpc.taskmanager.Util.Utils;
 import jp.fccpc.taskmanager.Values.Group;
 import jp.fccpc.taskmanager.Values.User;
 
@@ -27,17 +23,18 @@ import jp.fccpc.taskmanager.Values.User;
 public class GroupSearchResultAdapter extends ArrayAdapter<Group> {
     static final int RESOURCE_ID = R.layout.list_item_group_search_result;
     private Context mContext;
-    private List<Group> mResultGroups, mCurrentGroups;
+    private List<Group> mResultGroups;
+    private List<Boolean> mAlreadyAdded;
     private LayoutInflater mInflater;
 
     private String sGroupName, sOwnerName;
 
-    public GroupSearchResultAdapter(Context context, List<Group> resultItems, List<Group> currentItems) {
+    public GroupSearchResultAdapter(Context context, List<Group> resultItems, List<Boolean> alreadyadded) {
         super(context, RESOURCE_ID, resultItems);
 
         mContext = context;
         mResultGroups = resultItems;
-        mCurrentGroups = currentItems;
+        mAlreadyAdded = alreadyadded;
         mInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
@@ -60,23 +57,11 @@ public class GroupSearchResultAdapter extends ArrayAdapter<Group> {
         alreadyInText = (View) view.findViewById(R.id.group_search_already_in_text);
 
         // すでに入っているグループかどうか確認
-        // should be improved
-        Log.d("currentgroups", ""+mCurrentGroups.indexOf(group));
-        if (Utils.find(mCurrentGroups, new Function<Group, Boolean>() {
-                @Override
-                public Boolean apply(Group input) {
-                    if(group.getGroupId() == input.getGroupId()){
-                        return true;
-                    } else {
-                        return null;
-                    }
-                }
-            }) != null){
-
-            // すでに入っているグループならば背景色を変える
+        // すでに入っているグループならば背景色を変える
+        if(mAlreadyAdded.get(position)) {
             view.setBackgroundColor(Color.LTGRAY);
             alreadyInText.setVisibility(View.VISIBLE);
-         }
+        }
 
         App.get().getUserManager().get(group.getAdministratorId(), new UserManager.UserCallback() {
             @Override
