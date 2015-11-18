@@ -31,7 +31,7 @@ public class DBOpenHelper extends SQLiteOpenHelper {
     public static final String KEY_NAME = "name";
     public static final String KEY_ADMIN_ID = "admin_id";
     public static final String KEY_MEMBERSHIPS = "memberships";
-    public static final String[] GROUP_COLUMNS = {KEY_ID, KEY_NAME, KEY_ADMIN_ID, KEY_MEMBERSHIPS, KEY_CREATED_AT, KEY_UPDATED_AT, KEY_ETAG};
+    public static final String[] GROUP_COLUMNS = {KEY_ID, KEY_NAME, KEY_ADMIN_ID, KEY_MEMBERSHIPS, KEY_UPDATED_AT, KEY_ETAG};
 
     // MEMBERSHIP TABLE - column names
     public static final String KEY_USER_ID = "user_id";
@@ -43,21 +43,20 @@ public class DBOpenHelper extends SQLiteOpenHelper {
     public static final String KEY_TITLE = "title";
     public static final String KEY_DEADLINE = "deadline";
     public static final String KEY_DETAIL = "detail";
-    public static final String KEY_REMINDER_TIME = "reminder_time";
+    public static final String KEY_REMINDER_TIME = "remainder_time";
     public static final String KEY_DONE_AT = "done_at";
     public static final String[] TASK_COLUMNS = {KEY_ID, KEY_GROUP_ID, KEY_TITLE, KEY_DEADLINE, KEY_DETAIL, KEY_REMINDER_TIME, KEY_DONE_AT, KEY_CREATED_AT, KEY_UPDATED_AT, KEY_ETAG};
 
     // USER TABLE - column names
     public static final String KEY_EMAIL = "email";
     public static final String KEY_TOKEN = "token";
-    public static final String[] USER_COLUMNS = {KEY_ID, KEY_NAME, KEY_EMAIL};
+    public static final String[] USER_COLUMNS = {KEY_USER_ID, KEY_NAME, KEY_EMAIL, KEY_TOKEN};
 
     // Statements
     // GROUP TABLE create statement
     private static final String CREATE_TABLE_GROUP
             = "CREATE TABLE " + TABLE_GROUP + "("
-            + KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "
-            + KEY_GROUP_ID + " INTEGER NOT NULL, "
+            + KEY_ID + " INTEGER PRIMARY KEY NOT NULL, "
             + KEY_NAME + " TEXT NOT NULL, "
             + KEY_ADMIN_ID + " INTEGER NOT NULL, "
             + KEY_MEMBERSHIPS + " TEXT, "
@@ -79,7 +78,7 @@ public class DBOpenHelper extends SQLiteOpenHelper {
     // TASK TABLE create statement
     private static final String CREATE_TABLE_TASK
             = "CREATE TABLE " + TABLE_TASK + "("
-            + KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "
+            + KEY_ID + " INTEGER PRIMARY KEY NOT NULL, "
             + KEY_GROUP_ID + " INTEGER NOT NULL, "
             + KEY_TITLE + " TEXT NOT NULL, "
             + KEY_DEADLINE + " INTEGER, "
@@ -87,7 +86,7 @@ public class DBOpenHelper extends SQLiteOpenHelper {
             + KEY_REMINDER_TIME + " INTEGER NOT NULL, "
             + KEY_CREATED_AT + " INTEGER NOT NULL, "
             + KEY_UPDATED_AT + " INTEGER NOT NULL, "
-            + KEY_DONE_AT + " INTEGER NOT NULL, "
+            + KEY_DONE_AT + " INTEGER, "
             + KEY_ETAG + " TEXT"
             + ")";
 
@@ -95,6 +94,7 @@ public class DBOpenHelper extends SQLiteOpenHelper {
     private static final String CREATE_TABLE_USER
             = "CREATE TABLE " + TABLE_USER + "("
             + KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "
+            + KEY_USER_ID + " INTEGER NOT NULL, "
             + KEY_NAME + " TEXT NOT NULL, "
             + KEY_EMAIL + " TEXT NOT NULL, "
             + KEY_TOKEN + " TEXT"

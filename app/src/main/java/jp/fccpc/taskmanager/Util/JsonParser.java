@@ -30,15 +30,15 @@ public class JsonParser {
             for(int i=0; i<ja.length(); i++) {
                 JSONObject jo = ja.getJSONObject(i);
                 Task t = new Task(
-                        jo.getLong("id"),
-                        jo.getLong("group_id"),
-                        jo.getString("title"),
-                        jo.getLong("deadline"),
-                        jo.getString("detail"),
-                        jo.getString("reminder_time"),
-                        jo.getLong("created_at"),
-                        jo.getLong("updated_at"),
-                        jo.getLong("done_at"),
+                        getLongJSON(jo, "id"),
+                        getLongJSON(jo, "group_id"),
+                        getStringJSON(jo, "title"),
+                        getLongJSON(jo, "deadline"),
+                        getStringJSON(jo, "detail"),
+                        getStringJSON(jo, "remainder_time"),
+                        getLongJSON(jo, "created_at"),
+                        getLongJSON(jo, "updated_at"),
+                        getLongJSON(jo, "done_at"),
                         ""
                 );
                 taskList.add(t);
@@ -58,11 +58,11 @@ public class JsonParser {
             for(int i=0; i<ja.length(); i++) {
                 JSONObject jo = ja.getJSONObject(i);
                 Group g = new Group(
-                        jo.getLong("id"),
-                        jo.getString("name"),
-                        jo.getLong("administrator"),
-                        JsonParser.memberships(jo.getString("memberships")),
-                        jo.getLong("updated_at"),
+                        getLongJSON(jo, "id"),
+                        getStringJSON(jo, "name"),
+                        getLongJSON(jo, "administrator"),
+                        JsonParser.memberships(getStringJSON(jo, "memberships")),
+                        getLongJSON(jo, "updated_at"),
                         ""
                 );
                 groupList.add(g);
@@ -82,9 +82,9 @@ public class JsonParser {
             for(int i=0; i<ja.length(); i++) {
                 JSONObject jo = ja.getJSONObject(i);
                 User u = new User(
-                        jo.getLong("id"),
-                        jo.getString("name"),
-                        jo.getString("email_address")
+                        getLongJSON(jo, "id"),
+                        getStringJSON(jo, "name"),
+                        getStringJSON(jo, "email_address")
                 );
                 userList.add(u);
             }
@@ -104,10 +104,10 @@ public class JsonParser {
                 JSONObject jo = ja.getJSONObject(i);
                 Membership m = new Membership(
                         null,
-                        jo.getLong("group_id"),
-                        jo.getLong("user_id"),
-                        jo.getBoolean("group_agreed"),
-                        jo.getBoolean("user_agreed"),
+                        getLongJSON(jo, "group_id"),
+                        getLongJSON(jo, "user_id"),
+                        getBoolJSON(jo, "group_agreed"),
+                        getBoolJSON(jo, "user_agreed"),
                         ""
                 );
                 memberList.add(m);
@@ -127,11 +127,11 @@ public class JsonParser {
             for(int i=0; i<ja.length(); i++) {
                 JSONObject jo = ja.getJSONObject(i);
                 BoardItem b = new BoardItem(
-                        jo.getLong("number"),
-                        jo.getLong("user_id"),
-                        jo.getString("user_name"),
-                        jo.getLong("created_at"),
-                        jo.getString("content")
+                        getLongJSON(jo, "number"),
+                        getLongJSON(jo, "user_id"),
+                        getStringJSON(jo, "user_name"),
+                        getLongJSON(jo, "created_at"),
+                        getStringJSON(jo, "content")
                 );
                 boardItemList.add(b);
             }
@@ -160,6 +160,7 @@ public class JsonParser {
 
     static public JSONObject str2JsonObject(String str) {
         Log.d(TAG, str);
+        if(str == null) { return null; }
         JSONObject jo = null;
         try {
             jo = new JSONObject(str);
@@ -173,6 +174,7 @@ public class JsonParser {
 
     static public JSONArray str2JsonArray(String str) {
         Log.d(TAG, str);
+        if(str == null) { return null; }
         JSONArray ja = null;
         try {
             ja = new JSONArray(str);
@@ -204,5 +206,39 @@ public class JsonParser {
         }
 
         return ret.toString();
+    }
+
+
+    private static Long getLongJSON(JSONObject jo, String cName) {
+        Long retL = null;
+        try{
+            retL = jo.getLong(cName);
+        } catch(JSONException e) {
+            retL = null;
+        }
+
+        return retL;
+    }
+
+    private static String getStringJSON(JSONObject jo, String cName) {
+        String retS = null;
+        try{
+            retS = jo.getString(cName);
+        } catch(JSONException e) {
+            retS = null;
+        }
+
+        return retS;
+    }
+
+    private static boolean getBoolJSON(JSONObject jo, String cName) {
+        boolean retB = false;
+        try{
+            retB = jo.getBoolean(cName);
+        } catch(JSONException e) {
+            retB = false;
+        }
+
+        return retB;
     }
 }

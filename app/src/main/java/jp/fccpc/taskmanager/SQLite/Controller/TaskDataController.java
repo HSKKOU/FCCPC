@@ -3,7 +3,6 @@ package jp.fccpc.taskmanager.SQLite.Controller;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +33,6 @@ public class TaskDataController extends SQLiteDataController {
     }
 
     public long createTask(Task task){
-        // TODO: updated_atの実装を待つ。
         ContentValues v = new ContentValues();
         v.put(KEY_ID, task.getTaskId());
         v.put(KEY_GROUP_ID, task.getGroupId());
@@ -44,9 +42,9 @@ public class TaskDataController extends SQLiteDataController {
         v.put(KEY_REMINDER_TIME, task.getReminderTime());
         v.put(KEY_CREATED_AT, task.getCreatedAt());
         v.put(KEY_UPDATED_AT, task.getUpdatedAt());
-        v.put(KEY_DONE_AT, task.getDoneAt());
+        v.put(KEY_DONE_AT, this.NLong2long(task.getDoneAt()));
         v.put(KEY_ETAG, task.getETag());
-        return super.createModel(v);
+        return this.createModel(v);
     }
 
 //    public void createDefaultTasks(int num){
@@ -61,7 +59,7 @@ public class TaskDataController extends SQLiteDataController {
 //    }
 
     public Task getTask(Long id) {
-        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        db = dbHelper.getReadableDatabase();
         Cursor c = db.query(TABLE_TASK,
                 TASK_COLUMNS,
                 " id = ?",
@@ -71,39 +69,33 @@ public class TaskDataController extends SQLiteDataController {
                 null,
                 null);
 
-        if(c != null) c.moveToFirst();
+        if(c != null){
+            c.moveToFirst();
+            return this.cursor2task(c);
+        }
 
-        return this.cursor2task(c);
+        db.close();
+
+        return null;
     }
 
     public void deleteTask(Task task) {
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
-        db.delete(TABLE_TASK,
-                KEY_ID + " = ?",
-                new String[]{ String.valueOf(task.getTaskId())});
-        db.close();
+        this.deleteModel(String.valueOf(task.getTaskId()));
     }
 
-    public int updateTask(Task task) {
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
-
+    public long updateTask(Task task) {
         ContentValues values = new ContentValues();
         values.put(KEY_GROUP_ID, task.getGroupId());
         values.put(KEY_TITLE, task.getTitle());
-        values.put(KEY_DEADLINE, task.getTitle());
+        values.put(KEY_DEADLINE, task.getDeadline());
         values.put(KEY_DETAIL, task.getDetail());
         values.put(KEY_REMINDER_TIME, task.getReminderTime());
+        values.put(KEY_CREATED_AT, task.getCreatedAt());
         values.put(KEY_UPDATED_AT, task.getUpdatedAt());
-        values.put(KEY_DONE_AT, task.getDoneAt());
+        values.put(KEY_DONE_AT, this.NLong2long(task.getDoneAt()));
         values.put(KEY_ETAG, task.getETag());
 
-        int id = db.update(TABLE_TASK, //table
-                values,
-                KEY_ID + " = ?",
-                new String[]{String.valueOf(task.getTaskId())});
-        db.close();
-
-        return id;
+        return this.updateModel(values, String.valueOf(task.getTaskId()));
     }
 
     public List<Task> getAllTasks(){
@@ -118,6 +110,30 @@ public class TaskDataController extends SQLiteDataController {
                 themeList.add(t);
             } while (c.moveToNext());
         }
+        db.close();
+
+        return themeList;
+    }
+
+    public List<Task> getAllTasks(Long groupId){
+        db = dbHelper.getReadableDatabase();
+        List<Task> themeList = new ArrayList<Task>();
+        Cursor c = db.query(TABLE_TASK,
+                TASK_COLUMNS,
+                KEY_GROUP_ID + " = ?",
+                new String[]{String.valueOf(groupId)},
+                null,
+                null,
+                null,
+                null);
+
+        if (c.moveToFirst()) {
+            do {
+                Task t = this.cursor2task(c);
+                themeList.add(t);
+            } while (c.moveToNext());
+        }
+        db.close();
 
         return themeList;
     }
@@ -125,12 +141,16 @@ public class TaskDataController extends SQLiteDataController {
     private List<Task> getComletedTasks(boolean tf) {
         db = dbHelper.getReadableDatabase();
         List<Task> themeList = new ArrayList<Task>();
-        String str_tf = (tf ? "1" : "0");
+
+        String whereArg = "";
+        if(tf) {whereArg = KEY_DONE_AT + " > 0";}
+        else {whereArg = KEY_DONE_AT + " = 0";}
+
         Cursor c = db.query(
                 this.tableName,
                 null,
-                KEY_DONE_AT + " = ?",
-                new String[]{str_tf},
+                whereArg,
+                null,
                 null,
                 null,
                 null,
@@ -143,6 +163,7 @@ public class TaskDataController extends SQLiteDataController {
                 themeList.add(t);
             } while (c.moveToNext());
         }
+        db.close();
 
         return themeList;
     }
@@ -151,6 +172,8 @@ public class TaskDataController extends SQLiteDataController {
     public List<Task> getUnCompletedTasks() { return getComletedTasks(false); }
 
     private Task cursor2task(Cursor c) {
+        if(c.getCount() == 0) { return null; }
+
         Task t = new Task(
                 c.getLong(c.getColumnIndex(KEY_ID)),
                 c.getLong(c.getColumnIndex(KEY_GROUP_ID)),
@@ -160,10 +183,20 @@ public class TaskDataController extends SQLiteDataController {
                 c.getString(c.getColumnIndex(KEY_REMINDER_TIME)),
                 c.getLong(c.getColumnIndex(KEY_CREATED_AT)),
                 c.getLong(c.getColumnIndex(KEY_UPDATED_AT)),
-                c.getLong(c.getColumnIndex(KEY_DONE_AT)),
+                this.long2NLong(c.getLong(c.getColumnIndex(KEY_DONE_AT))),
                 c.getString(c.getColumnIndex(KEY_ETAG))
         );
 
         return t;
+    }
+
+    private Long NLong2long(Long in) {
+        if(in == null) { return 0L; }
+        return in;
+    }
+
+    private Long long2NLong(Long in) {
+        if(in == 0) {return null;}
+        return in;
     }
 }

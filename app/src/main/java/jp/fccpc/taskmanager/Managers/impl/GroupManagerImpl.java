@@ -5,11 +5,13 @@ import android.content.Context;
 import java.util.List;
 
 import jp.fccpc.taskmanager.Managers.GroupManager;
+import jp.fccpc.taskmanager.Managers.UserManager;
 import jp.fccpc.taskmanager.SQLite.Controller.GroupDataController;
 import jp.fccpc.taskmanager.Server.EndPoint;
 import jp.fccpc.taskmanager.Server.ServerConnector;
 import jp.fccpc.taskmanager.Util.JsonParser;
 import jp.fccpc.taskmanager.Values.Group;
+import jp.fccpc.taskmanager.Values.User;
 
 /**
  * Created by Shunta on 10/22/15.
@@ -28,7 +30,10 @@ public class GroupManagerImpl extends ManagerImpl implements GroupManager {
             ServerConnector sc = new ServerConnector(context, new ServerConnector.ServerConnectorDelegate() {
                 @Override
                 public void recieveResponse(String responseStr) {
-                    callback.callback(JsonParser.groups(responseStr));
+                    List<Group> groupList = JsonParser.groups(responseStr);
+                    for(Group g : groupList) { groupDataController.updateGroup(g); }
+
+                    callback.callback(groupList);
                 }
             });
 
@@ -38,7 +43,7 @@ public class GroupManagerImpl extends ManagerImpl implements GroupManager {
 
             sc.execute(endPoint, method, params, null);
         } else {
-            // TODO: sql
+            callback.callback(this.groupDataController.getAllGroups());
         }
     }
 
@@ -48,7 +53,10 @@ public class GroupManagerImpl extends ManagerImpl implements GroupManager {
             ServerConnector sc = new ServerConnector(context, new ServerConnector.ServerConnectorDelegate() {
                 @Override
                 public void recieveResponse(String responseStr) {
-                    callback.callback(JsonParser.groups(responseStr).get(0));
+                    Group g = JsonParser.groups(responseStr).get(0);
+                    groupDataController.updateGroup(g);
+
+                    callback.callback(g);
                 }
             });
 
@@ -58,44 +66,102 @@ public class GroupManagerImpl extends ManagerImpl implements GroupManager {
 
             sc.execute(endPoint, method, params, null);
         } else {
-            // TODO: sql
+            callback.callback(this.groupDataController.getGroup(groupId));
         }
     }
 
     @Override
     public void search(String groupName, String adminName, final GroupListCallback callback) {
+        callback.callback(null);
+        return;
+
+//        if (isOnline()) {
+//            ServerConnector sc = new ServerConnector(new ServerConnector.ServerConnectorDelegate() {
+//                @Override
+//                public void recieveResponse(String responseStr) {
+//                    List<Group> groupList = JsonParser.groups(responseStr);
+//                    for(Group g : groupList) { groupDataController.updateGroup(g); }
+//
+//                    callback.callback(groupList);
+//                }
+//            });
+//
+//            String endPoint = EndPoint.group(null);
+//            String method = ServerConnector.GET;
+//            String params = null;
+//
+//            sc.execute(endPoint, method, params, null);
+//        } else {
+//            callback.callback(null);
+//        }
+    }
+
+    @Override
+    public void searchWithGroupName(String groupName, final GroupListCallback callback) {
         if (isOnline()) {
-            /*
             ServerConnector sc = new ServerConnector(new ServerConnector.ServerConnectorDelegate() {
                 @Override
                 public void recieveResponse(String responseStr) {
-                    callback.callback(JsonParser.groups(responseStr));
+                    List<Group> groupList = JsonParser.groups(responseStr);
+                    for(Group g : groupList) { groupDataController.updateGroup(g); }
+
+                    callback.callback(groupList);
                 }
             });
 
             String endPoint = EndPoint.group(null);
             String method = ServerConnector.GET;
-            String params = null;
+            String params = "name=" + groupName;
 
             sc.execute(endPoint, method, params, null);
-            */
         } else {
-            // TODO: sql
+            callback.callback(null);
         }
     }
 
     @Override
-    public void searchWithGroupName(String groupName, final GroupListCallback callback) {
-
-    }
-
-    @Override
     public void searchWithAdminName(String adminName, final GroupListCallback callback) {
+        if (isOnline()) {
 
+            UserManager um = new UserManagerImpl(context);
+
+            um.searchUser(adminName, new UserManager.UserListCallback() {
+                @Override
+                public void callback(List<User> userList) {
+                    if(userList.size() == 0) {
+                        callback.callback(null);
+                        return;
+                    }
+
+                    User u = userList.get(0);
+
+                    ServerConnector sc = new ServerConnector(new ServerConnector.ServerConnectorDelegate() {
+                        @Override
+                        public void recieveResponse(String responseStr) {
+                            List<Group> groupList = JsonParser.groups(responseStr);
+                            for (Group g : groupList) {
+                                groupDataController.updateGroup(g);
+                            }
+
+                            callback.callback(groupList);
+                        }
+                    });
+
+                    String endPoint = EndPoint.group(null);
+                    String method = ServerConnector.GET;
+                    String params = "administrator=" + u.getUserId();
+
+                    sc.execute(endPoint, method, params, null);
+                }
+            });
+
+        } else {
+            callback.callback(null);
+        }
     }
 
     @Override
-    public void create(Group group, final Callback callback) {
+    public void create(final Group group, final Callback callback) {
         if (isOnline()) {
             ServerConnector sc = new ServerConnector(context, new ServerConnector.ServerConnectorDelegate() {
                 @Override

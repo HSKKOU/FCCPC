@@ -50,7 +50,7 @@ public class Auth {
                 Log.d(TAG, token);
 
                 UserDataController udc = new UserDataController(context);
-                udc.updateToken(userName, token);
+                udc.updateToken(token);
 
                 callback.recieveResponse(success, data);
             }
@@ -63,6 +63,7 @@ public class Auth {
 
     public static void logout(final Context context, String userName, AuthCallback callback) {
         // TODO: logout function
+        callback.recieveResponse(true, "");
     }
 
     /*

@@ -4,12 +4,12 @@ import android.content.Context;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.nio.charset.Charset;
 
 /**
  * Created by Shunta on 10/27/15.
  */
 public class ManagerImpl {
+
     protected Context context;
 
     ManagerImpl(Context context) {

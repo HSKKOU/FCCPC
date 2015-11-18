@@ -9,8 +9,8 @@ import jp.fccpc.taskmanager.SQLite.Controller.TaskDataController;
 import jp.fccpc.taskmanager.Server.EndPoint;
 import jp.fccpc.taskmanager.Server.ServerConnector;
 import jp.fccpc.taskmanager.Util.JsonParser;
-import jp.fccpc.taskmanager.Values.Task;
 import jp.fccpc.taskmanager.Values.BoardItem;
+import jp.fccpc.taskmanager.Values.Task;
 
 /**
  * Created by Shunta on 10/22/15.
@@ -29,8 +29,11 @@ public class TaskManagerImpl extends ManagerImpl implements TaskManager {
             ServerConnector sc = new ServerConnector(context, new ServerConnector.ServerConnectorDelegate() {
                 @Override
                 public void recieveResponse(String responseStr) {
-                    
-                    callback.callback(JsonParser.tasks(responseStr));
+                    if("err".equals(responseStr)){ callback.callback(null); }
+                    List<Task> taskList = JsonParser.tasks(responseStr);
+                    for(Task t : taskList) { taskDataController.updateTask(t); }
+
+                    callback.callback(taskList);
                 }
             });
 
@@ -40,7 +43,7 @@ public class TaskManagerImpl extends ManagerImpl implements TaskManager {
 
             sc.execute(endPoint, method, params, null);
         } else {
-            // TODO: sql
+            callback.callback(this.taskDataController.getAllTasks());
         }
     }
 
@@ -50,7 +53,11 @@ public class TaskManagerImpl extends ManagerImpl implements TaskManager {
             ServerConnector sc = new ServerConnector(context, new ServerConnector.ServerConnectorDelegate() {
                 @Override
                 public void recieveResponse(String responseStr) {
-                    callback.callback(JsonParser.tasks(responseStr));
+                    if("err".equals(responseStr)){ callback.callback(null); }
+                    List<Task> taskList = JsonParser.tasks(responseStr);
+                    for(Task t : taskList) { taskDataController.updateTask(t); }
+
+                    callback.callback(taskList);
                 }
             });
 
@@ -60,7 +67,7 @@ public class TaskManagerImpl extends ManagerImpl implements TaskManager {
 
             sc.execute(endPoint, method, params, null);
         } else {
-            // TODO: sql
+            callback.callback(this.taskDataController.getAllTasks(groupId));
         }
     }
 
@@ -70,14 +77,10 @@ public class TaskManagerImpl extends ManagerImpl implements TaskManager {
             ServerConnector sc = new ServerConnector(context, new ServerConnector.ServerConnectorDelegate() {
                 @Override
                 public void recieveResponse(String responseStr) {
-                    try {
-                        Task task = JsonParser.tasks(responseStr).get(0);
-                        taskDataController.updateTask(task);
-                        task = taskDataController.getTask(task.getTaskId());
-                        callback.callback(task);
-                    } catch (Exception e) {
-                        callback.callback(null);
-                    }
+                    if("err".equals(responseStr)){ callback.callback(null); }
+                    Task task = JsonParser.tasks(responseStr).get(0);
+                    taskDataController.updateTask(task);
+                    callback.callback(task);
                 }
             });
 
@@ -87,7 +90,7 @@ public class TaskManagerImpl extends ManagerImpl implements TaskManager {
 
             sc.execute(endPoint, method, params, null);
         } else {
-            // TODO: sql
+            callback.callback(this.taskDataController.getTask(taskId));
         }
     }
 
@@ -97,6 +100,7 @@ public class TaskManagerImpl extends ManagerImpl implements TaskManager {
             ServerConnector sc = new ServerConnector(context, new ServerConnector.ServerConnectorDelegate() {
                 @Override
                 public void recieveResponse(String responseStr) {
+                    if("err".equals(responseStr)){ callback.callback(null); }
                     callback.callback(JsonParser.boardItems(responseStr));
                 }
             });
@@ -108,14 +112,9 @@ public class TaskManagerImpl extends ManagerImpl implements TaskManager {
 
             sc.execute(endPoint, method, params, null);
         } else {
-            // TODO: sql
+            callback.callback(null);
         }
 
-    }
-
-    @Override
-    public void getBoardItems(Long taskId, int num, BoardItemListCallback callback) {
-        // TODO: implementation
     }
 
     @Override
@@ -124,6 +123,7 @@ public class TaskManagerImpl extends ManagerImpl implements TaskManager {
             ServerConnector sc = new ServerConnector(context, new ServerConnector.ServerConnectorDelegate() {
                 @Override
                 public void recieveResponse(String responseStr) {
+                    if("err".equals(responseStr)){ callback.callback(false); }
                     callback.callback(true);
                 }
             });
@@ -151,6 +151,7 @@ public class TaskManagerImpl extends ManagerImpl implements TaskManager {
             ServerConnector sc = new ServerConnector(context, new ServerConnector.ServerConnectorDelegate() {
                 @Override
                 public void recieveResponse(String responseStr) {
+                    if("err".equals(responseStr)){ callback.callback(false); }
                     callback.callback(true);
                 }
             });
@@ -173,6 +174,7 @@ public class TaskManagerImpl extends ManagerImpl implements TaskManager {
             ServerConnector sc = new ServerConnector(context, new ServerConnector.ServerConnectorDelegate() {
                 @Override
                 public void recieveResponse(String responseStr) {
+                    if("err".equals(responseStr)){ callback.callback(false); }
                     callback.callback(true);
                 }
             });
@@ -200,6 +202,7 @@ public class TaskManagerImpl extends ManagerImpl implements TaskManager {
             ServerConnector sc = new ServerConnector(context, new ServerConnector.ServerConnectorDelegate() {
                 @Override
                 public void recieveResponse(String responseStr) {
+                    if("err".equals(responseStr)){ callback.callback(false); }
                     callback.callback(true);
                 }
             });
@@ -220,6 +223,7 @@ public class TaskManagerImpl extends ManagerImpl implements TaskManager {
             ServerConnector sc = new ServerConnector(context, new ServerConnector.ServerConnectorDelegate() {
                 @Override
                 public void recieveResponse(String responseStr) {
+                    if("err".equals(responseStr)){ callback.callback(false); }
                     callback.callback(true);
                 }
             });
@@ -249,6 +253,7 @@ public class TaskManagerImpl extends ManagerImpl implements TaskManager {
             ServerConnector sc = new ServerConnector(context, new ServerConnector.ServerConnectorDelegate() {
                 @Override
                 public void recieveResponse(String responseStr) {
+                    if("err".equals(responseStr)){ callback.callback(null); }
                     callback.callback(JsonParser.users(responseStr));
                 }
             });
@@ -259,7 +264,7 @@ public class TaskManagerImpl extends ManagerImpl implements TaskManager {
 
             sc.execute(endPoint, method, params, null);
         } else {
-
+            callback.callback(null);
         }
     }
 

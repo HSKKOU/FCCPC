@@ -60,7 +60,7 @@ public class MembershipDataController extends SQLiteDataController {
         db.close();
     }
 
-    public int updateGroup(Membership membership) {
+    public int updateMembership(Membership membership) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
         ContentValues values = new ContentValues();

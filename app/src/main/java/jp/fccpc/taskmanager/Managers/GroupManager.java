@@ -4,7 +4,6 @@ import java.util.List;
 
 import jp.fccpc.taskmanager.Values.Group;
 
-
 /**
  * Created by nakac on 15/10/22.
  */
@@ -15,7 +14,7 @@ public interface GroupManager {
 
     void getList(GroupListCallback callback);
 
-    void get(Long groupId, GroupCallback callBack);
+    void get(Long groupId, GroupCallback callback);
 
     void search(String groupName, String adminName, GroupListCallback callback);
 

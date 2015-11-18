@@ -1,11 +1,9 @@
 package jp.fccpc.taskmanager.Managers.impl;
 
 import android.content.Context;
-import android.util.Log;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.List;
 
 import jp.fccpc.taskmanager.Managers.UserManager;
 import jp.fccpc.taskmanager.SQLite.Controller.UserDataController;
@@ -56,7 +54,9 @@ public class UserManagerImpl extends ManagerImpl implements UserManager {
             ServerConnector sc = new ServerConnector(context, new ServerConnector.ServerConnectorDelegate() {
                 @Override
                 public void recieveResponse(String responseStr) {
-                    callback.callback(JsonParser.users(responseStr).get(0));
+                    User u = JsonParser.users(responseStr).get(0);
+                    userDataController.updateUser(u);
+                    callback.callback(u);
                 }
             });
 
@@ -66,7 +66,7 @@ public class UserManagerImpl extends ManagerImpl implements UserManager {
 
             sc.execute(endPoint, method, params, null);
         } else {
-            // TODO: sql
+            callback.callback(this.userDataController.getUser(userId));
         }
     }
 
@@ -86,7 +86,7 @@ public class UserManagerImpl extends ManagerImpl implements UserManager {
 
             sc.execute(endPoint, method, params, null);
         } else {
-            // TODO: sql
+            callback.callback(null);
         }
     }
 
@@ -107,7 +107,7 @@ public class UserManagerImpl extends ManagerImpl implements UserManager {
 
             sc.execute(endPoint, method, params, null);
         } else {
-            // TODO: sql
+            callback.callback(false);
         }
     }
 
@@ -128,7 +128,7 @@ public class UserManagerImpl extends ManagerImpl implements UserManager {
 
             sc.execute(endPoint, method, params, null);
         } else {
-            // TODO: sql
+            callback.callback(false);
         }
     }
 
@@ -142,14 +142,14 @@ public class UserManagerImpl extends ManagerImpl implements UserManager {
                 }
             });
 
-            String endPoint = EndPoint.userSearch();
+            String endPoint = EndPoint.user(null);
             String method = ServerConnector.PUT;
             String params = makeParamsString(new String[]{OLD_PASSWORD_KEY, PASSWORD_KEY},
                     new String[]{hashed(oldPassword), hashed(newPassword)});
 
             sc.execute(endPoint, method, params, null);
         } else {
-            // TODO: sql
+            callback.callback(false);
         }
     }
 }
