@@ -1,6 +1,6 @@
 <resources>
     <!-- App Name -->
-    <string name="app_name">LayoutTest2</string>
+    <string name="app_name">宿題どうですか？</string>
 
     <!-- menu items -->
     <string name="menu_group_detail">グループ詳細</string>
@@ -33,11 +33,13 @@
     <string name="unfinished_task">未完了のタスク</string>
 
     <!-- task create activity -->
+    <string name="task_create_activity_name">新規タスクを作成</string>
     <string name="task_create_title">タスク名</string>
     <string name="task_create_deadline">締め切り</string>
     <string name="task_create_content">説明</string>
 
     <!-- task detail activity -->
+    <string name="task_detail_activity_name">タスク詳細</string>
     <string name="task_detail_title">タスク名</string>
     <string name="task_detail_deadline">締め切り</string>
     <string name="task_detail_content">説明</string>
@@ -45,13 +47,18 @@
     <string name="task_detail_comment_hint">　(新しいコメントを入力)</string>
 
     <!-- group create activity -->
+    <string name="group_create_activity_name">新規グループを作成</string>
     <string name="group_create_name">グループ名</string>
     <string name="group_create_user_text">グループのユーザー</string>
     <string name="group_add_name">グループ名</string>
     <string name="group_add_owner_name">オーナー名</string>
     <string name="group_add_already_added">すでにメンバーです</string>
 
+    <!-- group add activity -->
+    <string name="group_add_activity_name">既存のグループを検索して追加</string>
+
     <!-- group detail activity -->
+    <string name="group_detail_activity_name">グループの詳細</string>
     <string name="group_detail_name">グループ名</string>
     <string name="group_detail_user_text">グループのユーザー</string>
     <string name="group_detail_already_added">ユーザーの承認待ち</string>
