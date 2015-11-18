@@ -12,6 +12,7 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -21,7 +22,6 @@ import jp.fccpc.taskmanager.Managers.App;
 import jp.fccpc.taskmanager.Managers.GroupManager;
 import jp.fccpc.taskmanager.Managers.TaskManager;
 import jp.fccpc.taskmanager.Managers.UserManager;
-import jp.fccpc.taskmanager.Managers.mock.GroupManagerMock;
 import jp.fccpc.taskmanager.R;
 import jp.fccpc.taskmanager.Values.Group;
 import jp.fccpc.taskmanager.Values.Membership;
@@ -46,6 +46,7 @@ public class TaskListFragment extends Fragment {
 
     private int checkedCounter = 0;
 
+    private int myPositionAtGroupList;
     private boolean isMainLayout;
     private int myMembershipPosition;
     private Long myId;
@@ -64,8 +65,8 @@ public class TaskListFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         if (getArguments().containsKey(ARG_POSITION)){
-            int position = getArguments().getInt(ARG_POSITION);
-            mGroup = ((GroupManagerMock) App.get().getGroupManager()).getList().get(position);
+            myPositionAtGroupList = getArguments().getInt(ARG_POSITION);
+            //mGroup = ((GroupManagerMock) App.get().getGroupManager()).getList().get(position);
         }
     }
 
@@ -78,98 +79,115 @@ public class TaskListFragment extends Fragment {
         waitingUserAcceptLayout = (LinearLayout) rootView.findViewById(R.id.task_list_waiting_user_accept);
         waitingGroupAcceptLayout = (LinearLayout) rootView.findViewById(R.id.task_list_waiting_group_accept);
 
-        if (mGroup != null) {
-            // 自分の ID を取得
-            final Long[] myId_ = new Long[1];
-            App.get().getUserManager().get(null, new UserManager.UserCallback() {
-                @Override
-                public void callback(User user) {
-                    myId_[0] = user.getUserId();
-                }
-            });
-            myId = myId_[0];
-
-            Membership myMembership = null;
-            // 自分が招待されているかどうか確認
-            int i = 0;
-            for(Membership m : mGroup.getMemberships()){
-                if(m.getUserId().equals(myId)){
-                    myMembership = m;
-                    break;
-                }
-                i++;
-            }
-            myMembershipPosition = i;
-
-            if(myMembership == null || (!myMembership.isUserAgreed() && !myMembership.isGroupAgreed())){
-                // Todo: handle this (should not happen)
-                return rootView;
-            }
-
-            // 承認状況によって使用するレイアウトを変更
-            if(myMembership.isGroupAgreed() && !myMembership.isUserAgreed()){
-                // ユーザー承認ボタンを表示
-                mainLayout.setVisibility(View.GONE);
-                waitingUserAcceptLayout.setVisibility(View.VISIBLE);
-                waitingGroupAcceptLayout.setVisibility(View.GONE);
-                isMainLayout = false;
-
-                setupWaitingUserAcceptLayout(rootView);
-            } else if (!myMembership.isGroupAgreed() && myMembership.isUserAgreed()){
-                // グループ承認待ち画面を表示
-                mainLayout.setVisibility(View.GONE);
-                waitingUserAcceptLayout.setVisibility(View.GONE);
-                waitingGroupAcceptLayout.setVisibility(View.VISIBLE);
-                isMainLayout = false;
-            } else {
-                // 実際のタスクリストを表示
-                mainLayout.setVisibility(View.VISIBLE);
-                waitingUserAcceptLayout.setVisibility(View.GONE);
-                waitingGroupAcceptLayout.setVisibility(View.GONE);
-                isMainLayout = true;
-
-                setupMainLayout(rootView);
-            }
-        }
-        return rootView;
-    }
-
-    public void setupWaitingUserAcceptLayout(final View rootView){
-        TextView noteText = (TextView) rootView.findViewById(R.id.task_list_user_accept_note);
-        final String[] ownerName = new String[1];
-        App.get().getUserManager().get(mGroup.getAdministratorId(), new UserManager.UserCallback() {
+        // 1: get Group
+        // 2: get my User
+        // 3: setup layout
+        App.get().getGroupManager().getList(new GroupManager.GroupListCallback() {
             @Override
-            public void callback(User user) {
-                if(user != null){
-                    ownerName[0] = user.getName();
+            public void callback(List<Group> groupList) {
+                if (groupList != null) {
+                    mGroup = groupList.get(myPositionAtGroupList);
+
+                    App.get().getUserManager().get(null, new UserManager.UserCallback() {
+                        @Override
+                        public void callback(User user) {
+                            if (user != null) {
+                                myId = user.getUserId();
+
+                                Membership myMembership = null;
+                                // 自分が招待されているかどうか確認
+                                int i = 0;
+                                for (Membership m : mGroup.getMemberships()) {
+                                    if (m.getUserId().equals(myId)) {
+                                        myMembership = m;
+                                        break;
+                                    }
+                                    i++;
+                                }
+                                myMembershipPosition = i;
+
+                                chooseLayout(myMembership, rootView);
+
+                            } else {
+                                // Todo: handle error
+                            }
+                        }
+                    });
                 } else {
                     // Todo: handle error
                 }
             }
-        } );
-        String s = ownerName[0] + "さんからグループ「" + mGroup.getName() +"」に招待されています";
-        noteText.setText(s);
-        Button acceptButton = (Button) rootView.findViewById(R.id.task_list_user_accept_button);
-        acceptButton.setOnClickListener(new View.OnClickListener() {
+        });
+
+        return rootView;
+    }
+
+    // ユーザー/グループが参加を許可しているかどうかによって使用するレイアウトを選択
+    public void chooseLayout(Membership myMembership, View rootView){
+        if(myMembership == null || (!myMembership.isUserAgreed() && !myMembership.isGroupAgreed())){
+            // Todo: handle this (should not happen)
+
+        } else if (myMembership.isGroupAgreed() && !myMembership.isUserAgreed()){
+            // ユーザー承認ボタンを表示
+            mainLayout.setVisibility(View.GONE);
+            waitingUserAcceptLayout.setVisibility(View.VISIBLE);
+            waitingGroupAcceptLayout.setVisibility(View.GONE);
+            isMainLayout = false;
+
+            setupWaitingUserAcceptLayout(rootView);
+        } else if (!myMembership.isGroupAgreed() && myMembership.isUserAgreed()){
+            // グループ承認待ち画面を表示
+            mainLayout.setVisibility(View.GONE);
+            waitingUserAcceptLayout.setVisibility(View.GONE);
+            waitingGroupAcceptLayout.setVisibility(View.VISIBLE);
+            isMainLayout = false;
+        } else {
+            // 実際のタスクリストを表示
+            mainLayout.setVisibility(View.VISIBLE);
+            waitingUserAcceptLayout.setVisibility(View.GONE);
+            waitingGroupAcceptLayout.setVisibility(View.GONE);
+            isMainLayout = true;
+
+            setupMainLayout(rootView);
+        }
+    }
+
+    public void setupWaitingUserAcceptLayout(final View rootView){
+        App.get().getUserManager().get(mGroup.getAdministratorId(), new UserManager.UserCallback() {
             @Override
-            public void onClick(View view) {
-                // Membership 情報を変更
-                List<Membership> m = mGroup.getMemberships();
-                m.get(myMembershipPosition).setUserAgreed(true);
-                Group g = new Group(mGroup.getGroupId(), mGroup.getName(), mGroup.getAdministratorId(), m, Calendar.getInstance().getTimeInMillis());
+            public void callback(User user) {
+                if (user != null) {
+                    String ownerName = user.getName();
+                    String s = ownerName + "さんからグループ「" + mGroup.getName() + "」に招待されています";
 
-                App.get().getGroupManager().update(g, new GroupManager.Callback() {
-                    @Override
-                    public void callback(boolean success) {
-                        ;
-                    }
-                });
+                    TextView noteText = (TextView) rootView.findViewById(R.id.task_list_user_accept_note);
+                    noteText.setText(s);
 
-                // レイアウトを変更
-                waitingUserAcceptLayout.setVisibility(View.GONE);
-                mainLayout.setVisibility(View.VISIBLE);
-                isMainLayout = true;
-                setupMainLayout(rootView);
+                    Button acceptButton = (Button) rootView.findViewById(R.id.task_list_user_accept_button);
+                    acceptButton.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            // Membership 情報を変更
+                            List<Membership> m = mGroup.getMemberships();
+                            m.get(myMembershipPosition).setUserAgreed(true);
+                            Group g = new Group(mGroup.getGroupId(), mGroup.getName(), mGroup.getAdministratorId(), m, Calendar.getInstance().getTimeInMillis());
+
+                            App.get().getGroupManager().update(g, new GroupManager.Callback() {
+                                @Override
+                                public void callback(boolean success) {
+                                    // レイアウトを変更
+                                    waitingUserAcceptLayout.setVisibility(View.GONE);
+                                    mainLayout.setVisibility(View.VISIBLE);
+                                    isMainLayout = true;
+                                    setupMainLayout(rootView);
+                                }
+                            });
+                        }
+                    });
+
+                } else {
+                    // Todo: handle error
+                }
             }
         });
     }
@@ -238,31 +256,36 @@ public class TaskListFragment extends Fragment {
         }
     }
 
+    private boolean isDoingUpdateList = false;
     private void updateTaskList(){
+        if(isDoingUpdateList) return;
+
+        isDoingUpdateList = true;
         final TaskListFragment f = this;
         App.get().getTaskManager().getList(mGroup.getGroupId(), new TaskManager.TaskListCallback() {
             @Override
             public void callback(List<Task> taskList) {
                 if (taskList != null) {
-                    // Log.d("setTaskListAdapter", "called");
-
                     finished_tasks.clear();
                     unfinished_tasks.clear();
                     for (Task t : taskList) {
                         TaskListItem item = new TaskListItem(t.getTaskId(), t.getTitle(), t.getDeadline());
                         item.setTaskListFragment(f);
                         if (t.getDoneAt() != null) {
-                            // Log.d("setTaskListAdapter", "finished");
                             finished_tasks.add(item);
                         } else {
-                            // Log.d("setTaskListAdapter", "unfinished");
                             unfinished_tasks.add(item);
                         }
                     }
 
                     adapterUnfinished.notifyDataSetChanged();
                     adapterFinished.notifyDataSetChanged();
+                } else{
+                    // handle error
+                    Toast.makeText(getActivity(), "タスクリストの更新に失敗しました", Toast.LENGTH_SHORT).show();
                 }
+
+                isDoingUpdateList = false;
             }
         });
     }
