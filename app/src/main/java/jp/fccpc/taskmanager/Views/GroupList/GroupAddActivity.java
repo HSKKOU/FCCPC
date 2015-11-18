@@ -1,8 +1,8 @@
 package jp.fccpc.taskmanager.Views.GroupList;
 
-import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -12,6 +12,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.google.common.base.Function;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -21,21 +24,23 @@ import jp.fccpc.taskmanager.Managers.App;
 import jp.fccpc.taskmanager.Managers.GroupManager;
 import jp.fccpc.taskmanager.Managers.UserManager;
 import jp.fccpc.taskmanager.R;
-import jp.fccpc.taskmanager.Values.User;
+import jp.fccpc.taskmanager.Util.Utils;
 import jp.fccpc.taskmanager.Values.Group;
 import jp.fccpc.taskmanager.Values.Membership;
+import jp.fccpc.taskmanager.Values.User;
 
 /**
  * Created by tm on 2015/11/04.
  */
-public class GroupAddActivity extends Activity {
+public class GroupAddActivity extends AppCompatActivity {
     private EditText mGroupName, mOwnerName;
     private TextView mSearchResultNumText;
-    private ListView mSearchReusltView;
+    private ListView mSearchResultView;
     private GroupSearchResultAdapter mAdapter;
     private Button mSearchButton, mAddButton, mCancelbutton;
 
     private List<Group> resultGroups, currentGroups;
+    private List<Boolean> alreadyAdded; // 検索結果のグループ (resultGroups) にすでに加入しているどうか
     private Group mGroup;
 
     @Override
@@ -47,16 +52,19 @@ public class GroupAddActivity extends Activity {
         mGroupName = (EditText) findViewById(R.id.group_add_input_name);
         mOwnerName = (EditText) findViewById(R.id.group_add_input_owner_name);
 
+        mSearchResultView = (ListView) findViewById(R.id.group_search_result_list_view);
+        resultGroups = new ArrayList<>();
+        alreadyAdded = new ArrayList<Boolean>();
+        mAdapter = new GroupSearchResultAdapter(GroupAddActivity.this, resultGroups, alreadyAdded);
+        mSearchResultView.setAdapter(mAdapter);
+
+        currentGroups = null;
         App.get().getGroupManager().getList(new GroupManager.GroupListCallback() {
             @Override
             public void callback(List<Group> groupList) {
                 currentGroups = groupList;
             }
         });
-        mSearchReusltView = (ListView) findViewById(R.id.group_search_result_list_view);
-        resultGroups = new ArrayList<>();
-        mAdapter = new GroupSearchResultAdapter(GroupAddActivity.this, resultGroups, currentGroups);
-        mSearchReusltView.setAdapter(mAdapter);
 
         mSearchResultNumText = (TextView) findViewById(R.id.group_search_result_num_text);
 
@@ -64,16 +72,21 @@ public class GroupAddActivity extends Activity {
         mAddButton = (Button) findViewById(R.id.add_group_button_groupadd);
         mCancelbutton = (Button) findViewById(R.id.cancel_button_group_add);
 
+        mAddButton.setEnabled(false);
         mSearchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if(currentGroups == null){
+                    // should not happen
+                    Toast.makeText(GroupAddActivity.this, "検索に失敗しました", Toast.LENGTH_SHORT).show();
+                }
+                
                 final String groupNmae = mGroupName.getText().toString();
                 final String ownerName = mOwnerName.getText().toString();
+
                 if(groupNmae.equals("") && ownerName.equals("")){
                     return;
                 }
-
-                hideKeyboard();
 
                 // search group
                 App.get().getGroupManager().search(groupNmae, ownerName, new GroupManager.GroupListCallback() {
@@ -87,20 +100,35 @@ public class GroupAddActivity extends Activity {
                                 resultGroups.clear();
                                 mAdapter.notifyDataSetChanged();
 
-                                mAddButton.setVisibility(View.INVISIBLE);
+                                mAddButton.setEnabled(false);
                             } else {
-                                mSearchResultNumText.setText("" + (groupList.size()) + " 件見つかりました");
-
                                 resultGroups.clear();
                                 resultGroups.addAll(groupList);
+
+                                alreadyAdded.clear();
+                                // すでに加入しているグループかどうか調べる
+                                for(final Group g1 : groupList){
+                                    alreadyAdded.add(
+                                            (Utils.find(currentGroups, new Function<Group, Boolean>() {
+                                                @Override
+                                                public Boolean apply(Group input) {
+                                                    if (g1.getGroupId().equals(input.getGroupId()))
+                                                        return true;
+                                                    else return false;
+                                                }
+                                            }) != null)
+                                    );
+                                }
 
                                 mAdapter.setSearchWords(groupNmae, ownerName);
                                 mAdapter.notifyDataSetChanged();
 
-                                mAddButton.setVisibility(View.VISIBLE);
+                                mSearchResultNumText.setText("" + (groupList.size()) + " 件見つかりました");
+                                hideKeyboard();
                             }
                         } else {
                             // Todo: handle error
+                            Toast.makeText(GroupAddActivity.this, "グループの検索に失敗しました", Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
@@ -108,11 +136,17 @@ public class GroupAddActivity extends Activity {
         });
 
         mGroup = null;
-        mSearchReusltView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        mSearchResultView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                view.setSelected(true);
-                mGroup = (Group) ((ListView) adapterView).getItemAtPosition(i);
+                if(alreadyAdded.get(i)) {
+                    view.setSelected(false);
+                    mAddButton.setEnabled(false);
+                } else {
+                    view.setSelected(true);
+                    mAddButton.setEnabled(true);
+                    mGroup = (Group) ((ListView) adapterView).getItemAtPosition(i);
+                }
                 Log.d("onitemclick", mGroup.getName());
             }
         });
@@ -120,18 +154,17 @@ public class GroupAddActivity extends Activity {
         mAddButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                // グループを更新
                 if (mGroup != null) {
-                    // Todo: すでに入っているグループは追加しない
                     App.get().getUserManager().get(null, new UserManager.UserCallback() {
                         @Override
                         public void callback(User user) {
                             if (user != null) {
-                                Log.d("groupaddactivity", "aaaaa");
-                                // グループを更新
                                 // 自分を新しい membership として登録して update
                                 Membership me = new Membership(mGroup.getGroupId(), user.getUserId(), false, true);
                                 List<Membership> memberships = mGroup.getMemberships();
                                 memberships.add(me);
+
                                 long now = Calendar.getInstance().getTimeInMillis();
                                 Group g = new Group(mGroup.getGroupId(), mGroup.getName(), mGroup.getAdministratorId(), memberships, now);
 
@@ -144,6 +177,7 @@ public class GroupAddActivity extends Activity {
 
                             } else {
                                 // Todo: handle error
+                                Toast.makeText(GroupAddActivity.this, "タスクの作成に失敗しました", Toast.LENGTH_SHORT).show();
                             }
 
                             finish();
@@ -152,7 +186,7 @@ public class GroupAddActivity extends Activity {
                 }
             }
         });
-        mAddButton.setVisibility(View.GONE);
+        mAddButton.setEnabled(false);
 
         mCancelbutton.setOnClickListener(new View.OnClickListener() {
             @Override

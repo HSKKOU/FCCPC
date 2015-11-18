@@ -1,13 +1,14 @@
 package jp.fccpc.taskmanager.Views.GroupList;
 
-import android.app.Activity;
 import android.app.DialogFragment;
 import android.app.FragmentManager;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -25,7 +26,7 @@ import jp.fccpc.taskmanager.Views.UserSearchDialog.UserSearchDialog;
 /**
  * Created by tm on 2015/11/15.
  */
-public class GroupDetailActivity extends Activity implements UserSearchDialog.userSearchDialogInterface {
+public class GroupDetailActivity extends AppCompatActivity implements UserSearchDialog.userSearchDialogInterface {
     private TextView mGroupName;
 
     private ListView mGroupUserList;
@@ -38,61 +39,54 @@ public class GroupDetailActivity extends Activity implements UserSearchDialog.us
     private List<Membership> mMemberships;
     private List<User> mUsers;
     private boolean isOwner;
-    private boolean isChanged;
+
+    Boolean completeSetup;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        completeSetup = false;
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_group_detail);
 
+        GroupId = getIntent().getLongExtra("GroupId", 0L);
+
+        // 1 : get my Id
+        // 2 : get this group Id
+        // 3 : setup
         App.get().getUserManager().get(null, new UserManager.UserCallback() {
             @Override
             public void callback(User user) {
                 if (user != null) {
                     myId = user.getUserId();
+
+                    App.get().getGroupManager().get(GroupId, new GroupManager.GroupCallback() {
+                        @Override
+                        public void callback(Group group) {
+                            if (group != null) {
+                                mGroup = group;
+                                isOwner = (myId.equals(mGroup.getAdministratorId()));
+
+                                setUpField();
+                            } else {
+                                // Todo: handle error
+                            }
+                        }
+                    });
+
                 } else {
                     // Todo: handle error
                 }
             }
         });
 
-        GroupId = getIntent().getLongExtra("GroupId", 0L);
-        App.get().getGroupManager().get(GroupId, new GroupManager.GroupCallback() {
-            @Override
-            public void callback(Group group) {
-                if (group != null) {
-                    mGroup = group;
-                } else {
-                    // Todo: handle error
-                }
-            }
-        });
+    }
 
-        isOwner = (myId.equals(mGroup.getAdministratorId()));
-
-
+    public void setUpField(){
         mGroupName = (TextView) findViewById(R.id.group_detail_input_name);
         mGroupName.setText(mGroup.getName());
 
         mGroupUserList = (ListView) findViewById(R.id.group_detail_user_listview);
-
-        // Membership から List<User> を構成
-        mMemberships = mGroup.getMemberships();
-        mUsers = new ArrayList<>();
-        for(Membership m : mMemberships){
-            App.get().getUserManager().get(m.getUserId(), new UserManager.UserCallback() {
-                @Override
-                public void callback(User user) {
-                    if (user != null) {
-                        mUsers.add(user);
-                    } else {
-                        // Todo: handle error
-                    }
-                }
-            });
-        }
-        mAdapter = new GroupDetailUserListAdapter(GroupDetailActivity.this, mMemberships, mUsers, mGroup.getAdministratorId(), isOwner);
-        mGroupUserList.setAdapter(mAdapter);
 
         mAddUserButton = (Button) findViewById(R.id.group_detail_add_user_item_button);
         if(isOwner) {
@@ -100,6 +94,8 @@ public class GroupDetailActivity extends Activity implements UserSearchDialog.us
             mAddUserButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
+                    if (!completeSetup) return;
+
                     // call user "search dialog
                     DialogFragment dialog = new UserSearchDialog(mUsers);
                     dialog.show(manager, "usersearch");
@@ -118,10 +114,11 @@ public class GroupDetailActivity extends Activity implements UserSearchDialog.us
                     finish();
                 }
             });
-            mUpdateButton.setVisibility(View.VISIBLE);
+            mUpdateButton.setEnabled(false);
         } else {
             mUpdateButton.setVisibility(View.GONE);
         }
+
 
         mCancelButton = (Button) findViewById(R.id.cancel_button_groupdetail);
         mCancelButton.setOnClickListener(new View.OnClickListener() {
@@ -131,32 +128,53 @@ public class GroupDetailActivity extends Activity implements UserSearchDialog.us
             }
         });
 
-        isChanged = false;
-    }
+        // Membership から List<User> を構成
+        mMemberships = new ArrayList<>();
+        for(Membership m : mGroup.getMemberships()){
+            mMemberships.add(new Membership(m.getGroupId(), m.getUserId(), m.isGroupAgreed(), m.isUserAgreed()));
+        }
+        mUsers = new ArrayList<>();
+        mAdapter = new GroupDetailUserListAdapter(GroupDetailActivity.this, mMemberships, mUsers, mGroup.getAdministratorId(), isOwner);
+        mGroupUserList.setAdapter(mAdapter);
 
-    public void acceptUser(int position){
-        mMemberships.get(position).setGroupAgreed(true);
-        isChanged = true;
-        mAdapter.notifyDataSetChanged();
-    }
-
-    public void updateGroup(){
-        // Todo: isChanged の判定精度を上げる
-        if(isChanged) {
-            Group g = new Group(mGroup.getGroupId(), mGroup.getName(), mGroup.getAdministratorId(), mMemberships, Calendar.getInstance().getTimeInMillis());
-            App.get().getGroupManager().update(g, new GroupManager.Callback() {
+        for(Membership m : mMemberships){
+            App.get().getUserManager().get(m.getUserId(), new UserManager.UserCallback() {
                 @Override
-                public void callback(boolean success) {
-                    ;
+                public void callback(User user) {
+                    if (user != null) {
+                        mUsers.add(user);
+                    } else {
+                        // Todo: handle error
+                    }
+
+                    completeSetup = true;
                 }
             });
         }
     }
 
+    public void acceptUser(int position){
+        mMemberships.get(position).setGroupAgreed(true);
+        mUpdateButton.setEnabled(true);
+        mAdapter.notifyDataSetChanged();
+    }
+
+    public void updateGroup(){
+        Group g = new Group(mGroup.getGroupId(), mGroup.getName(), mGroup.getAdministratorId(), mMemberships, Calendar.getInstance().getTimeInMillis());
+        App.get().getGroupManager().update(g, new GroupManager.Callback() {
+            @Override
+            public void callback(boolean success) {
+                if(!success){
+                    Toast.makeText(GroupDetailActivity.this, "グループの更新に失敗しました", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
+
     public void removeUser(int position){
         mUsers.remove(position);
         mMemberships.remove(position);
-        isChanged = true;
+        mUpdateButton.setEnabled(true);
         mAdapter.notifyDataSetChanged();
     }
 
@@ -168,7 +186,7 @@ public class GroupDetailActivity extends Activity implements UserSearchDialog.us
         mUsers.add(user);
         Membership g = new Membership(mGroup.getGroupId(), user.getUserId(), true, false);
         mMemberships.add(g);
-        isChanged = true;
+        mUpdateButton.setEnabled(true);
         mAdapter.notifyDataSetChanged();
     }
 }

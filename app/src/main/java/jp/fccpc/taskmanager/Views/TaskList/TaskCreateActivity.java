@@ -2,6 +2,8 @@ package jp.fccpc.taskmanager.Views.TaskList;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -23,11 +25,13 @@ import jp.fccpc.taskmanager.Views.DateDialog.SelectDateFragment;
 public class TaskCreateActivity extends AppCompatActivity
         implements SelectDateFragment.OnSelectDateListener {
 
-    EditText mTitle, mContent, mDeadLine;
-    Button mCreateButton, mCancelButton;
+    private EditText mTitle, mContent, mDeadLine;
+    private Button mCreateButton, mCancelButton;
 
-    Long mGroupId;
-    Long deadline;
+    private Long mGroupId;
+    private Long deadline;
+
+    private boolean isTitleSet, isDeadlineSet, isContentSet;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +72,7 @@ public class TaskCreateActivity extends AppCompatActivity
                 }
             }
         });
+        mCreateButton.setEnabled(false);
 
         mCancelButton = (Button) findViewById(R.id.cancel_button_taskcreate);
         mCancelButton.setOnClickListener(new View.OnClickListener() {
@@ -76,7 +81,50 @@ public class TaskCreateActivity extends AppCompatActivity
                 finish();
             }
         });
+
+        isTitleSet = false;
+        isDeadlineSet = false;
+        isContentSet = false;
+
+        mTitle.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                isTitleSet = (charSequence.length() != 0);
+                checkField();
+            }
+            @Override
+            public void afterTextChanged(Editable editable) {}
+        });
+        mDeadLine.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                isDeadlineSet = (charSequence.length() != 0);
+                checkField();
+            }
+            @Override
+            public void afterTextChanged(Editable editable) {}
+        });
+        mContent.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                isContentSet  = (charSequence.length() != 0);
+                checkField();
+            }
+            @Override
+            public void afterTextChanged(Editable editable) {}
+        });
     }
+
+    private void checkField(){
+        mCreateButton.setEnabled( (isTitleSet && isDeadlineSet && isContentSet) );
+    }
+
 
     private void clickDateTextField(){
         SelectDateFragment sdf = new SelectDateFragment();
@@ -107,7 +155,9 @@ public class TaskCreateActivity extends AppCompatActivity
         App.get().getTaskManager().create(task, new TaskManager.Callback() {
             @Override
             public void callback(boolean success) {
-                ;
+                if(!success){
+                    Toast.makeText(TaskCreateActivity.this, "タスクを作成できませんでいsた", Toast.LENGTH_SHORT).show();
+                }
             }
         });
     }

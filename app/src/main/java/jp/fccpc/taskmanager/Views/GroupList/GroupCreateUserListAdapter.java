@@ -61,13 +61,15 @@ public class GroupCreateUserListAdapter extends ArrayAdapter<User> {
         });
 
         // 自分の名前なら取り除けないようにボタンを隠す
+        removeButton.setVisibility(View.INVISIBLE);
         App.get().getUserManager().get(null, new UserManager.UserCallback() {
             @Override
             public void callback(User u) {
                 if(u != null && u.getUserId() == user.getUserId()) {
-                    removeButton.setVisibility(View.INVISIBLE);
                     isOwner.setVisibility(View.VISIBLE);
                     view.setBackgroundColor(Color.rgb(247,171,166));
+                } else {
+                    removeButton.setVisibility(View.VISIBLE);
                 }
             }
         });
