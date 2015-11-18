@@ -72,6 +72,7 @@ public class GroupAddActivity extends Activity {
         mAddButton = (Button) findViewById(R.id.add_group_button_groupadd);
         mCancelbutton = (Button) findViewById(R.id.cancel_button_group_add);
 
+        mAddButton.setEnabled(false);
         mSearchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -99,7 +100,7 @@ public class GroupAddActivity extends Activity {
                                 resultGroups.clear();
                                 mAdapter.notifyDataSetChanged();
 
-                                mAddButton.setVisibility(View.GONE);
+                                mAddButton.setEnabled(false);
                             } else {
                                 resultGroups.clear();
                                 resultGroups.addAll(groupList);
@@ -140,10 +141,10 @@ public class GroupAddActivity extends Activity {
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 if(alreadyAdded.get(i)) {
                     view.setSelected(false);
-                    mAddButton.setVisibility(View.GONE);
+                    mAddButton.setEnabled(false);
                 } else {
                     view.setSelected(true);
-                    mAddButton.setVisibility(View.VISIBLE);
+                    mAddButton.setEnabled(true);
                     mGroup = (Group) ((ListView) adapterView).getItemAtPosition(i);
                 }
                 Log.d("onitemclick", mGroup.getName());
@@ -185,7 +186,7 @@ public class GroupAddActivity extends Activity {
                 }
             }
         });
-        mAddButton.setVisibility(View.GONE);
+        mAddButton.setEnabled(false);
 
         mCancelbutton.setOnClickListener(new View.OnClickListener() {
             @Override

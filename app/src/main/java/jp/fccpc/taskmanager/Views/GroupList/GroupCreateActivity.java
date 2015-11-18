@@ -5,6 +5,8 @@ import android.app.DialogFragment;
 import android.app.FragmentManager;
 import android.content.Context;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -47,6 +49,7 @@ public class GroupCreateActivity extends Activity implements UserSearchDialog.us
         setContentView(R.layout.activity_group_create);
 
         mGroupNameText = (TextView) findViewById(R.id.group_name_text_group_create);
+
         mGroupName = (EditText) findViewById(R.id.group_create_input_name);
         mGroupName.requestFocus();
 
@@ -60,7 +63,7 @@ public class GroupCreateActivity extends Activity implements UserSearchDialog.us
                     mUsers.add(user);
                     OwnerId = user.getUserId();
                 } else {
-                    // Todo: handle error;
+                    // Todo: handle error; (should not happen)
                 }
             }
         });
@@ -90,12 +93,33 @@ public class GroupCreateActivity extends Activity implements UserSearchDialog.us
                 }
             }
         });
+        mCreateButton.setEnabled(false);
 
         mCancelButton = (Button) findViewById(R.id.cancel_button_groupcreate);
         mCancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 finish();
+            }
+        });
+
+        // グループ名が1文字以上なら作成ボタンを出す
+        mGroupName.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                if(charSequence.length() != 0 ) {
+                    mCreateButton.setEnabled(true);
+                } else {
+                    mCreateButton.setEnabled(false);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
             }
         });
     }
@@ -109,7 +133,7 @@ public class GroupCreateActivity extends Activity implements UserSearchDialog.us
         members.add(owner);
 
         for(User u: mUsers){
-            if(u.getUserId() == OwnerId) continue;
+            if(u.getUserId().equals(OwnerId)) continue;
 
             Membership m = new Membership(null, u.getUserId(), true, false);
             members.add(m);
@@ -122,12 +146,19 @@ public class GroupCreateActivity extends Activity implements UserSearchDialog.us
         long now = Calendar.getInstance().getTimeInMillis();
         List<Membership> members = createMembers();
 
-        Group group = new Group(null, mGroupName.getText().toString(), OwnerId, members, now);
+        if(members.isEmpty()){
+            // メンバーシップに自分が登録できていない (should not happen)
+            Toast.makeText(GroupCreateActivity.this, "グループの作成に失敗しました", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
+        Group group = new Group(null, mGroupName.getText().toString(), OwnerId, members, now);
         App.get().getGroupManager().create(group, new GroupManager.Callback() {
             @Override
             public void callback(boolean success) {
-                ;
+                if(!success){
+                    Toast.makeText(GroupCreateActivity.this, "グループの作成に失敗しました", Toast.LENGTH_SHORT).show();
+                }
             }
         });
     }
