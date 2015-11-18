@@ -1,10 +1,10 @@
 package jp.fccpc.taskmanager.Views.GroupList;
 
-import android.app.Activity;
 import android.app.DialogFragment;
 import android.app.FragmentManager;
 import android.content.Context;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.MotionEvent;
@@ -32,7 +32,7 @@ import jp.fccpc.taskmanager.Views.UserSearchDialog.UserSearchDialog;
 /**
  * Created by tm on 2015/11/04.
  */
-public class GroupCreateActivity extends Activity implements UserSearchDialog.userSearchDialogInterface {
+public class GroupCreateActivity extends AppCompatActivity implements UserSearchDialog.userSearchDialogInterface {
     private TextView mGroupNameText;
     private EditText mGroupName;
     private ListView mGroupUserList;

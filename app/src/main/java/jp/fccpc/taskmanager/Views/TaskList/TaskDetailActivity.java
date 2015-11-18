@@ -1,9 +1,9 @@
 package jp.fccpc.taskmanager.Views.TaskList;
 
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -32,7 +32,7 @@ import jp.fccpc.taskmanager.Values.User;
 /**
  * Created by tm on 2015/11/11.
  */
-public class TaskDetailActivity extends Activity {
+public class TaskDetailActivity extends AppCompatActivity {
     private TextView mTitle, mDeadline, mReminderTime, mContent, mFinishedUsers;
     private EditText mAddBoardItemText;
 

@@ -1,8 +1,8 @@
 package jp.fccpc.taskmanager.Views.GroupList;
 
-import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -32,7 +32,7 @@ import jp.fccpc.taskmanager.Values.User;
 /**
  * Created by tm on 2015/11/04.
  */
-public class GroupAddActivity extends Activity {
+public class GroupAddActivity extends AppCompatActivity {
     private EditText mGroupName, mOwnerName;
     private TextView mSearchResultNumText;
     private ListView mSearchResultView;

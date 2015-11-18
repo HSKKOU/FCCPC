@@ -1,9 +1,9 @@
 package jp.fccpc.taskmanager.Views.GroupList;
 
-import android.app.Activity;
 import android.app.DialogFragment;
 import android.app.FragmentManager;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
@@ -26,7 +26,7 @@ import jp.fccpc.taskmanager.Views.UserSearchDialog.UserSearchDialog;
 /**
  * Created by tm on 2015/11/15.
  */
-public class GroupDetailActivity extends Activity implements UserSearchDialog.userSearchDialogInterface {
+public class GroupDetailActivity extends AppCompatActivity implements UserSearchDialog.userSearchDialogInterface {
     private TextView mGroupName;
 
     private ListView mGroupUserList;
