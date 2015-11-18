@@ -1,0 +1,120 @@
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    >
+
+    <LinearLayout
+        android:id="@+id/task_list_main"
+        android:layout_height="match_parent"
+        android:layout_width="match_parent"
+        android:orientation="vertical"
+        >
+
+        <TextView
+            android:id="@+id/unfinished_task"
+            style="?android:attr/textAppearanceLarge"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="16dp"
+            android:text="@string/unfinished_task"
+            />
+
+        <ListView
+            android:id="@+id/unfinished_task_list"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="@color/listview_background"
+            android:drawSelectorOnTop="false" />
+
+        <TextView
+            android:id="@+id/finished_task"
+            style="?android:attr/textAppearanceLarge"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="16dp"
+            android:text="@string/finished_task"
+            />
+
+        <ListView
+            android:id="@+id/finished_task_list"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="@color/listview_background"
+            android:drawSelectorOnTop="false" />
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="100dp"
+            android:gravity="right|bottom"
+            android:background="#ff694937"
+            >
+            <Button
+                android:id="@+id/complete_task_button_tasklist"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="30dp"
+                android:layout_marginBottom="10dp"
+                android:text="@string/task_complete_button"
+                />
+            <Button
+                android:id="@+id/create_task_button_tasklist"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="30dp"
+                android:layout_marginBottom="10dp"
+                android:text="@string/task_add_button"
+                android:visibility="invisible"
+                />
+        </LinearLayout>
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:id="@+id/task_list_waiting_group_accept"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#5588dd"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:visibility="gone">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="@string/task_list_waiting_group_accept_text"
+            />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/task_list_waiting_user_accept"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#dd8855"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/task_list_user_accept_note"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            />
+
+        <Button
+            android:id="@+id/task_list_user_accept_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="@string/task_list_waiting_user_accept_text"
+            />
+
+    </LinearLayout>
+</FrameLayout>

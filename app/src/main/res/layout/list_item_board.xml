@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="50dp">
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:layout_marginLeft="10dp"
+        >
+
+        <TextView
+            android:id="@+id/number_board_item"
+            android:text="number"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <!-- 将来的にアイコンにする? -->
+        <View
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:background="#dd2255"
+            android:layout_marginBottom="5dp"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="4"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/username_board_item"
+                android:text="username"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start"/>
+
+            <TextView
+                android:id="@+id/date_board_item"
+                android:text="date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:layout_marginLeft="20dp"
+                android:gravity="end" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/content_board_item"
+            android:text="content"
+            android:textSize="@dimen/abc_text_size_display_1_material"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+</LinearLayout>

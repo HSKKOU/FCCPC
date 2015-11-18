@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="50dp"
+    >
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:layout_marginLeft="5dp"
+        >
+
+        <!-- 将来的にアイコンにする? -->
+        <View
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:background="#dd2255"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="5"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/group_user_is_owner_text"
+            android:text="オーナー"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start"
+            android:visibility="invisible"
+            />
+
+        <TextView
+            android:id="@+id/user_name_item_text"
+            android:text="ユーザー名"
+            android:textSize="@dimen/abc_action_bar_content_inset_material"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1.2"
+        android:layout_gravity="center_vertical"
+        android:orientation="vertical"
+        >
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/user_already_added_text"
+            android:textSize="10dp"
+            android:textColor="#2288df"
+            android:text="@string/group_detail_already_added"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/waiting_owner_accept_text"
+            android:textSize="10dp"
+            android:textColor="#2288df"
+            android:text="@string/group_detail_waiting_owner_accept"/>
+
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/user_accept_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="承認"
+        android:layout_gravity="end"
+        />
+
+    <Button
+        android:id="@+id/user_remove_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="-"
+        android:layout_gravity="end"
+        />
+
+</LinearLayout>

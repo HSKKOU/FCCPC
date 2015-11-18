@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="wrap_content"
+    android:layout_height="match_parent"
+    android:layout_marginLeft="30dp"
+    android:layout_marginTop="20dp"
+    >
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="25dp"
+
+        android:id="@+id/change_user_name"
+        android:text="@string/change_username"
+        />
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+
+        android:id="@+id/user_name"
+        android:text="Username"
+        />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="25dp"
+
+        android:id="@+id/change_email"
+        android:text="@string/change_email"
+        />
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+
+        android:id="@+id/user_email"
+        android:text="Email address"
+        />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="25dp"
+
+        android:id="@+id/change_password"
+        android:text="@string/change_password"
+        />
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+
+        android:id="@+id/user_password"
+        android:text="************"
+        />
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/logout_button_useraccount"
+            android:text="@string/user_logout"
+            />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/delete_button_useraccount"
+            android:text="@string/user_delete"
+            />
+
+    </LinearLayout>
+
+</LinearLayout>

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="jp.fccpc.taskmanager" >
+
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <application
+        android:allowBackup="true"
+        android:name="jp.fccpc.taskmanager.Managers.App"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme" >
+
+        <activity
+            android:name="jp.fccpc.taskmanager.Views.LogIn.LoginActivity"
+            android:label="login">
+        </activity>
+
+        <activity
+            android:name="jp.fccpc.taskmanager.Views.MainActivity"
+            android:label="LayoutTest2"
+            android:theme="@style/AppTheme.NoActionBar">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name="jp.fccpc.taskmanager.Views.TaskList.TaskCreateActivity"
+            android:label="TaskCreate">
+        </activity>
+        <activity
+            android:name="jp.fccpc.taskmanager.Views.TaskList.TaskDetailActivity"
+            android:label="TaskDetail">
+        </activity>
+
+        <activity
+            android:name="jp.fccpc.taskmanager.Views.GroupList.GroupDetailActivity"
+            android:label="GroupDetail">
+        </activity>
+        <activity
+            android:name="jp.fccpc.taskmanager.Views.GroupList.GroupCreateActivity"
+            android:label="GroupCreate">
+        </activity>
+        <activity
+            android:name="jp.fccpc.taskmanager.Views.GroupList.GroupAddActivity"
+            android:label="GroupAdd">
+        </activity>
+
+    </application>
+
+</manifest>

@@ -1,0 +1,62 @@
+<resources>
+    <!-- App Name -->
+    <string name="app_name">LayoutTest2</string>
+
+    <!-- menu items -->
+    <string name="menu_group_detail">グループ詳細</string>
+
+    <!-- login activity -->
+    <string name="login_button">ログイン</string>
+    <string name="login_prompt_password">*****</string>
+    <string name="login_prompt_email">e-mail</string>
+    <string name="action_sign_in_short">short sign in</string>
+
+    <!-- main activity -->
+    <string name="user_account_button_text">ユーザー情報</string>
+    <string name="add_group">+ 既存のグループを追加</string>
+    <string name="create_group">+ 新規グループ作成</string>
+
+    <!-- user account info fragment-->
+    <string name="change_username">ユーザー名を変更</string>
+    <string name="change_email">メールアドレスを変更</string>
+    <string name="change_password">パスワードを変更</string>
+    <string name="user_logout">ログアウト</string>
+    <string name="user_delete">アカウント削除</string>
+
+    <!-- task list fragment-->
+    <string name="task_list_waiting_user_accept_text">グループに参加する</string>
+    <string name="task_list_waiting_group_accept_text">グループオーナの承認待ちです</string>
+    <string name="task_complete_button">完了</string>
+    <string name="task_add_button">+</string>
+
+    <string name="finished_task">完了したタスク</string>
+    <string name="unfinished_task">未完了のタスク</string>
+
+    <!-- task create activity -->
+    <string name="task_create_title">タスク名</string>
+    <string name="task_create_deadline">締め切り</string>
+    <string name="task_create_content">説明</string>
+
+    <!-- task detail activity -->
+    <string name="task_detail_title">タスク名</string>
+    <string name="task_detail_deadline">締め切り</string>
+    <string name="task_detail_content">説明</string>
+    <string name="task_detail_finished_user_list">完了したユーザー</string>
+    <string name="task_detail_comment_hint">　(新しいコメントを入力)</string>
+
+    <!-- group create activity -->
+    <string name="group_create_name">グループ名</string>
+    <string name="group_create_user_text">グループのユーザー</string>
+    <string name="group_add_name">グループ名</string>
+    <string name="group_add_owner_name">オーナー名</string>
+    <string name="group_add_already_added">すでにメンバーです</string>
+
+    <!-- group detail activity -->
+    <string name="group_detail_name">グループ名</string>
+    <string name="group_detail_user_text">グループのユーザー</string>
+    <string name="group_detail_already_added">ユーザーの承認待ち</string>
+    <string name="group_detail_waiting_owner_accept">オーナーの承認待ち</string>
+
+    <!-- user search dialog -->
+    <string name="user_search_already_added">追加済み</string>
+</resources>
