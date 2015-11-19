@@ -10,6 +10,11 @@ import java.net.URLEncoder;
  */
 public class ManagerImpl {
 
+    protected interface DecodeResponseCallback{
+        void success();
+        void failure();
+    }
+
     protected Context context;
 
     ManagerImpl(Context context) {
@@ -37,5 +42,13 @@ public class ManagerImpl {
         }
 
         return paramsString;
+    }
+
+    protected void decodeResponse(String response, DecodeResponseCallback callback) {
+        if("err".equals(response)) {
+            callback.failure();
+        } else {
+            callback.success();
+        }
     }
 }

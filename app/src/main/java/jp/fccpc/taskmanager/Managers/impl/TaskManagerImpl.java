@@ -28,12 +28,23 @@ public class TaskManagerImpl extends ManagerImpl implements TaskManager {
         if (isOnline()) {
             ServerConnector sc = new ServerConnector(context, new ServerConnector.ServerConnectorDelegate() {
                 @Override
-                public void recieveResponse(String responseStr) {
-                    if("err".equals(responseStr)){ callback.callback(null); }
-                    List<Task> taskList = JsonParser.tasks(responseStr);
-                    for(Task t : taskList) { taskDataController.updateTask(t); }
+                public void recieveResponse(final String responseStr) {
+                    decodeResponse(responseStr, new DecodeResponseCallback() {
+                        @Override
+                        public void success() {
+                            List<Task> taskList = JsonParser.tasks(responseStr);
+                            for (Task t : taskList) {
+                                taskDataController.updateTask(t);
+                            }
 
-                    callback.callback(taskList);
+                            callback.callback(taskList);
+                        }
+
+                        @Override
+                        public void failure() {
+                            callback.callback(null);
+                        }
+                    });
                 }
             });
 
@@ -52,12 +63,23 @@ public class TaskManagerImpl extends ManagerImpl implements TaskManager {
         if (isOnline()) {
             ServerConnector sc = new ServerConnector(context, new ServerConnector.ServerConnectorDelegate() {
                 @Override
-                public void recieveResponse(String responseStr) {
-                    if("err".equals(responseStr)){ callback.callback(null); }
-                    List<Task> taskList = JsonParser.tasks(responseStr);
-                    for(Task t : taskList) { taskDataController.updateTask(t); }
+                public void recieveResponse(final String responseStr) {
+                    decodeResponse(responseStr, new DecodeResponseCallback() {
+                        @Override
+                        public void success() {
+                            List<Task> taskList = JsonParser.tasks(responseStr);
+                            for (Task t : taskList) {
+                                taskDataController.updateTask(t);
+                            }
 
-                    callback.callback(taskList);
+                            callback.callback(taskList);
+                        }
+
+                        @Override
+                        public void failure() {
+                            callback.callback(null);
+                        }
+                    });
                 }
             });
 
@@ -76,11 +98,20 @@ public class TaskManagerImpl extends ManagerImpl implements TaskManager {
         if (isOnline()) {
             ServerConnector sc = new ServerConnector(context, new ServerConnector.ServerConnectorDelegate() {
                 @Override
-                public void recieveResponse(String responseStr) {
-                    if("err".equals(responseStr)){ callback.callback(null); }
-                    Task task = JsonParser.tasks(responseStr).get(0);
-                    taskDataController.updateTask(task);
-                    callback.callback(task);
+                public void recieveResponse(final String responseStr) {
+                    decodeResponse(responseStr, new DecodeResponseCallback() {
+                        @Override
+                        public void success() {
+                            Task task = JsonParser.tasks(responseStr).get(0);
+                            taskDataController.updateTask(task);
+                            callback.callback(task);
+                        }
+
+                        @Override
+                        public void failure() {
+                            callback.callback(null);
+                        }
+                    });
                 }
             });
 
@@ -99,9 +130,18 @@ public class TaskManagerImpl extends ManagerImpl implements TaskManager {
         if (isOnline()) {
             ServerConnector sc = new ServerConnector(context, new ServerConnector.ServerConnectorDelegate() {
                 @Override
-                public void recieveResponse(String responseStr) {
-                    if("err".equals(responseStr)){ callback.callback(null); }
-                    callback.callback(JsonParser.boardItems(responseStr));
+                public void recieveResponse(final String responseStr) {
+                    decodeResponse(responseStr, new DecodeResponseCallback() {
+                        @Override
+                        public void success() {
+                            callback.callback(JsonParser.boardItems(responseStr));
+                        }
+
+                        @Override
+                        public void failure() {
+                            callback.callback(null);
+                        }
+                    });
                 }
             });
 
@@ -127,9 +167,18 @@ public class TaskManagerImpl extends ManagerImpl implements TaskManager {
         if (isOnline()) {
             ServerConnector sc = new ServerConnector(context, new ServerConnector.ServerConnectorDelegate() {
                 @Override
-                public void recieveResponse(String responseStr) {
-                    if("err".equals(responseStr)){ callback.callback(false); }
-                    callback.callback(true);
+                public void recieveResponse(final String responseStr) {
+                    decodeResponse(responseStr, new DecodeResponseCallback() {
+                        @Override
+                        public void success() {
+                            callback.callback(true);
+                        }
+
+                        @Override
+                        public void failure() {
+                            callback.callback(false);
+                        }
+                    });
                 }
             });
 
@@ -155,9 +204,18 @@ public class TaskManagerImpl extends ManagerImpl implements TaskManager {
         if (isOnline()) {
             ServerConnector sc = new ServerConnector(context, new ServerConnector.ServerConnectorDelegate() {
                 @Override
-                public void recieveResponse(String responseStr) {
-                    if("err".equals(responseStr)){ callback.callback(false); }
-                    callback.callback(true);
+                public void recieveResponse(final String responseStr) {
+                    decodeResponse(responseStr, new DecodeResponseCallback() {
+                        @Override
+                        public void success() {
+                            callback.callback(true);
+                        }
+
+                        @Override
+                        public void failure() {
+                            callback.callback(false);
+                        }
+                    });
                 }
             });
 
@@ -179,8 +237,17 @@ public class TaskManagerImpl extends ManagerImpl implements TaskManager {
             ServerConnector sc = new ServerConnector(context, new ServerConnector.ServerConnectorDelegate() {
                 @Override
                 public void recieveResponse(String responseStr) {
-                    if("err".equals(responseStr)){ callback.callback(false); }
-                    callback.callback(true);
+                    decodeResponse(responseStr, new DecodeResponseCallback() {
+                        @Override
+                        public void success() {
+                            callback.callback(true);
+                        }
+
+                        @Override
+                        public void failure() {
+                            callback.callback(false);
+                        }
+                    });
                 }
             });
 
@@ -206,9 +273,18 @@ public class TaskManagerImpl extends ManagerImpl implements TaskManager {
         if (isOnline()) {
             ServerConnector sc = new ServerConnector(context, new ServerConnector.ServerConnectorDelegate() {
                 @Override
-                public void recieveResponse(String responseStr) {
-                    if("err".equals(responseStr)){ callback.callback(false); }
-                    callback.callback(true);
+                public void recieveResponse(final String responseStr) {
+                    decodeResponse(responseStr, new DecodeResponseCallback() {
+                        @Override
+                        public void success() {
+                            callback.callback(true);
+                        }
+
+                        @Override
+                        public void failure() {
+                            callback.callback(false);
+                        }
+                    });
                 }
             });
 
@@ -227,9 +303,18 @@ public class TaskManagerImpl extends ManagerImpl implements TaskManager {
         if (isOnline()) {
             ServerConnector sc = new ServerConnector(context, new ServerConnector.ServerConnectorDelegate() {
                 @Override
-                public void recieveResponse(String responseStr) {
-                    if("err".equals(responseStr)){ callback.callback(false); }
-                    callback.callback(true);
+                public void recieveResponse(final String responseStr) {
+                    decodeResponse(responseStr, new DecodeResponseCallback() {
+                        @Override
+                        public void success() {
+                            callback.callback(true);
+                        }
+
+                        @Override
+                        public void failure() {
+                            callback.callback(false);
+                        }
+                    });
                 }
             });
 
@@ -257,9 +342,18 @@ public class TaskManagerImpl extends ManagerImpl implements TaskManager {
         if (isOnline()) {
             ServerConnector sc = new ServerConnector(context, new ServerConnector.ServerConnectorDelegate() {
                 @Override
-                public void recieveResponse(String responseStr) {
-                    if("err".equals(responseStr)){ callback.callback(null); }
-                    callback.callback(JsonParser.users(responseStr));
+                public void recieveResponse(final String responseStr) {
+                    decodeResponse(responseStr, new DecodeResponseCallback() {
+                        @Override
+                        public void success() {
+                            callback.callback(JsonParser.users(responseStr));
+                        }
+
+                        @Override
+                        public void failure() {
+                            callback.callback(null);
+                        }
+                    });
                 }
             });
 

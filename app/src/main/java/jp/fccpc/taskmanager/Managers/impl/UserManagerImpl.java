@@ -53,10 +53,20 @@ public class UserManagerImpl extends ManagerImpl implements UserManager {
         if (isOnline()) {
             ServerConnector sc = new ServerConnector(context, new ServerConnector.ServerConnectorDelegate() {
                 @Override
-                public void recieveResponse(String responseStr) {
-                    User u = JsonParser.users(responseStr).get(0);
-                    userDataController.updateUser(u);
-                    callback.callback(u);
+                public void recieveResponse(final String responseStr) {
+                    decodeResponse(responseStr, new DecodeResponseCallback() {
+                        @Override
+                        public void success() {
+                            User u = JsonParser.users(responseStr).get(0);
+                            userDataController.updateUser(u);
+                            callback.callback(u);
+                        }
+
+                        @Override
+                        public void failure() {
+                            callback.callback(null);
+                        }
+                    });
                 }
             });
 
@@ -75,8 +85,18 @@ public class UserManagerImpl extends ManagerImpl implements UserManager {
         if (isOnline()) {
             ServerConnector sc = new ServerConnector(context ,new ServerConnector.ServerConnectorDelegate() {
                 @Override
-                public void recieveResponse(String responseStr) {
-                    callback.callback(JsonParser.users(responseStr));
+                public void recieveResponse(final String responseStr) {
+                    decodeResponse(responseStr, new DecodeResponseCallback() {
+                        @Override
+                        public void success() {
+                            callback.callback(JsonParser.users(responseStr));
+                        }
+
+                        @Override
+                        public void failure() {
+                            callback.callback(null);
+                        }
+                    });
                 }
             });
 
@@ -95,8 +115,18 @@ public class UserManagerImpl extends ManagerImpl implements UserManager {
         if (isOnline()) {
             ServerConnector sc = new ServerConnector(context, new ServerConnector.ServerConnectorDelegate() {
                 @Override
-                public void recieveResponse(String responseStr) {
-                    callback.callback(true);
+                public void recieveResponse(final String responseStr) {
+                    decodeResponse(responseStr, new DecodeResponseCallback() {
+                        @Override
+                        public void success() {
+                            callback.callback(true);
+                        }
+
+                        @Override
+                        public void failure() {
+                            callback.callback(false);
+                        }
+                    });
                 }
             });
 
@@ -116,8 +146,18 @@ public class UserManagerImpl extends ManagerImpl implements UserManager {
         if (isOnline()) {
             ServerConnector sc = new ServerConnector(context, new ServerConnector.ServerConnectorDelegate() {
                 @Override
-                public void recieveResponse(String responseStr) {
-                    callback.callback(true);
+                public void recieveResponse(final String responseStr) {
+                    decodeResponse(responseStr, new DecodeResponseCallback() {
+                        @Override
+                        public void success() {
+                            callback.callback(true);
+                        }
+
+                        @Override
+                        public void failure() {
+                            callback.callback(false);
+                        }
+                    });
                 }
             });
 
@@ -137,8 +177,18 @@ public class UserManagerImpl extends ManagerImpl implements UserManager {
         if (isOnline()) {
             ServerConnector sc = new ServerConnector(context, new ServerConnector.ServerConnectorDelegate() {
                 @Override
-                public void recieveResponse(String responseStr) {
-                    callback.callback(true);
+                public void recieveResponse(final String responseStr) {
+                    decodeResponse(responseStr, new DecodeResponseCallback() {
+                        @Override
+                        public void success() {
+                            callback.callback(true);
+                        }
+
+                        @Override
+                        public void failure() {
+                            callback.callback(false);
+                        }
+                    });
                 }
             });
 
