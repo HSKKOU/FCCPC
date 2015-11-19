@@ -28,8 +28,8 @@ public class LoginActivity extends Activity {
         setContentView(R.layout.activity_login);
 
         // とりあえず
-        //UserDataController udc = new UserDataController(getApplicationContext());
-        //udc.createUser(new User(10L, "john", "email"));
+        UserDataController udc = new UserDataController(getApplicationContext());
+        udc.createUser(new User(10L, "john", "email"));
 
         //Todo: create Login menu
         mUserIdText = (EditText) findViewById(R.id.user_id);
