@@ -26,6 +26,8 @@ public class JsonParser {
 
         JSONArray ja = str2JsonArray(json);
 
+        if(ja == null) { return null; }
+
         try {
             for(int i=0; i<ja.length(); i++) {
                 JSONObject jo = ja.getJSONObject(i);
@@ -54,6 +56,8 @@ public class JsonParser {
 
         JSONArray ja = str2JsonArray(json);
 
+        if(ja == null) { return null; }
+
         try {
             for(int i=0; i<ja.length(); i++) {
                 JSONObject jo = ja.getJSONObject(i);
@@ -78,6 +82,8 @@ public class JsonParser {
 
         JSONArray ja = str2JsonArray(json);
 
+        if(ja == null) { return null; }
+
         try {
             for(int i=0; i<ja.length(); i++) {
                 JSONObject jo = ja.getJSONObject(i);
@@ -98,6 +104,8 @@ public class JsonParser {
         List<Membership> memberList = new ArrayList<Membership>();
 
         JSONArray ja = str2JsonArray(json);
+
+        if(ja == null) { return null; }
 
         try {
             for(int i=0; i<ja.length(); i++) {
@@ -123,6 +131,8 @@ public class JsonParser {
 
         JSONArray ja = str2JsonArray(json);
 
+        if(ja == null) { return null; }
+
         try {
             for(int i=0; i<ja.length(); i++) {
                 JSONObject jo = ja.getJSONObject(i);
@@ -145,6 +155,8 @@ public class JsonParser {
 
     static public String loginToken(String json) {
         JSONObject jo = str2JsonObject(json);
+
+        if(jo == null) { return null; }
 
         String token = null;
 
