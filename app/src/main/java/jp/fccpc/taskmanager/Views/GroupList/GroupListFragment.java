@@ -160,11 +160,13 @@ public class GroupListFragment extends ListFragment {
         App.get().getGroupManager().getList(new GroupManager.GroupListCallback() {
             @Override
             public void callback(List<Group> groupList) {
-                for (Group g : groupList) {
-                    GroupNames.add(g.getName());
-                }
+                if (groupList != null) {
+                    for (Group g : groupList) {
+                        GroupNames.add(g.getName());
+                    }
 
-                adapterGroup.notifyDataSetChanged();
+                    adapterGroup.notifyDataSetChanged();
+                }
             }
         });
     }
