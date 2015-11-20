@@ -68,7 +68,16 @@ public class UserManagerMock implements UserManager {
 
     @Override
     public void update(User user, Callback callback) {
-        callback.callback(true);
+        int i = 0;
+        for(User u : users){
+            if(user.getUserId().equals(u.getUserId())){
+                users.set(i, user);
+                break;
+            }
+            i++;
+        }
+
+        callback.callback( (i < users.size()) );
     }
 
     @Override

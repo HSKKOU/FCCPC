@@ -47,6 +47,7 @@ public class TaskDetailActivity extends AppCompatActivity {
 
     private final int BOARD_ITEM_NUM_SKIP = 5; // 1 度にロードする掲示板のコメント数
     private int loaded_num = 0;
+    private boolean isLoadingBoardItems;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +56,8 @@ public class TaskDetailActivity extends AppCompatActivity {
         setContentView(R.layout.activity_task_detail);
 
         taskId = getIntent().getLongExtra("taskId", 0L);
+
+        isLoadingBoardItems = false;
 
         mTitle = (TextView) findViewById(R.id.task_detail_input_title);
         mDeadline = (TextView) findViewById(R.id.task_detail_input_deadline);
@@ -166,14 +169,12 @@ public class TaskDetailActivity extends AppCompatActivity {
 
                 mAddBoardItemText.getEditableText().clear();
                 // キーボードを隠す
-                ((InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(mTitle.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
-                mTitle.requestFocus();
+                hideKeyboard();
 
                 // reload list
                 loadLatestBoardItems();
             }
         });
-
 
         // get task
         App.get().getTaskManager().get(taskId, new TaskManager.TaskCallback() {
@@ -182,7 +183,6 @@ public class TaskDetailActivity extends AppCompatActivity {
                 if (task != null) {
                     // set task info
                     if(task != null) {
-                        //baordItem = task.get
                         mTitle.setText(task.getTitle());
 
                         SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm", Locale.US);
@@ -228,12 +228,15 @@ public class TaskDetailActivity extends AppCompatActivity {
     // 入力時に画面をタッチしたらキーボードを隠す
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        ((InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(mTitle.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
-        mTitle.requestFocus();
+        hideKeyboard();
         return false;
     }
 
-    private boolean isLoadingBoardItems = false;
+    private void hideKeyboard(){
+        ((InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(mTitle.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+        mTitle.requestFocus();
+    }
+
     private void loadLatestBoardItems(){
         if(isLoadingBoardItems) return;
 
