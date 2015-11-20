@@ -8,7 +8,7 @@
     <!-- login activity -->
     <string name="login_button">ログイン</string>
     <string name="login_prompt_password">*****</string>
-    <string name="login_prompt_email">e-mail</string>
+    <string name="login_prompt_user_id">User Id</string>
     <string name="action_sign_in_short">short sign in</string>
 
     <!-- main activity -->

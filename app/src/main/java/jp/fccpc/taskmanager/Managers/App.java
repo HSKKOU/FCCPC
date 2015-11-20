@@ -7,9 +7,6 @@ import jp.fccpc.taskmanager.Managers.impl.AuthManagerImpl;
 import jp.fccpc.taskmanager.Managers.impl.GroupManagerImpl;
 import jp.fccpc.taskmanager.Managers.impl.TaskManagerImpl;
 import jp.fccpc.taskmanager.Managers.impl.UserManagerImpl;
-import jp.fccpc.taskmanager.Managers.mock.GroupManagerMock;
-import jp.fccpc.taskmanager.Managers.mock.TaskManagerMock;
-import jp.fccpc.taskmanager.Managers.mock.UserManagerMock;
 
 /**
  * Created by nakac on 15/10/23.
