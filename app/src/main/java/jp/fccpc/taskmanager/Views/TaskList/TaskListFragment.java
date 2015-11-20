@@ -7,10 +7,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.ExpandableListView;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -35,9 +34,11 @@ public class TaskListFragment extends Fragment {
     // current group
     private Group mGroup;
 
-    private ListView mUnFinishedTaskList, mFinishedTaskList;
-    private TaskListAdapterUnfinished adapterUnfinished;
-    private TaskListAdapterFinished adapterFinished;
+    private ExpandableListView mTaskList;
+    private TaskListAdapter mAdapter;
+
+    private final static int UNFINISHED_TASKS = 0;
+    private final static int FINISHED_TASKS = 1;
     private List<TaskListItem> unfinished_tasks;
     private List<TaskListItem> finished_tasks;
 
@@ -175,11 +176,16 @@ public class TaskListFragment extends Fragment {
                             App.get().getGroupManager().update(g, new GroupManager.Callback() {
                                 @Override
                                 public void callback(boolean success) {
-                                    // レイアウトを変更
-                                    waitingUserAcceptLayout.setVisibility(View.GONE);
-                                    mainLayout.setVisibility(View.VISIBLE);
-                                    isMainLayout = true;
-                                    setupMainLayout(rootView);
+                                    if(success) {
+                                        // レイアウトを変更
+                                        waitingUserAcceptLayout.setVisibility(View.GONE);
+                                        mainLayout.setVisibility(View.VISIBLE);
+                                        isMainLayout = true;
+                                        setupMainLayout(rootView);
+                                    } else {
+                                        // Todo : handle error
+                                        Toast.makeText(getActivity(), "通信に失敗しました", Toast.LENGTH_SHORT).show();
+                                    }
                                 }
                             });
                         }
@@ -193,33 +199,28 @@ public class TaskListFragment extends Fragment {
     }
 
     public void setupMainLayout(View rootView){
-        // for finished task lists
-        mUnFinishedTaskList = (ListView) rootView.findViewById(R.id.unfinished_task_list);
-        mUnFinishedTaskList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Intent intent = new Intent(getActivity(), TaskDetailActivity.class);
-                intent.putExtra("taskId", unfinished_tasks.get(i).getId());
-                startActivity(intent);
-            }
-        });
         unfinished_tasks = new ArrayList<>();
-        adapterUnfinished = new TaskListAdapterUnfinished(getActivity(), unfinished_tasks);
-        mUnFinishedTaskList.setAdapter(adapterUnfinished);
+        finished_tasks = new ArrayList<>();
 
-
-        mFinishedTaskList = (ListView) rootView.findViewById(R.id.finished_task_list);
-        mFinishedTaskList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        mTaskList = (ExpandableListView) rootView.findViewById(R.id.task_list_expandable_list);
+        mTaskList.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+            public boolean onChildClick(ExpandableListView expandableListView, View view, int i, int i1, long l) {
                 Intent intent = new Intent(getActivity(), TaskDetailActivity.class);
-                intent.putExtra("taskId", finished_tasks.get(i).getId());
+
+                Long taskId;
+                if(i == UNFINISHED_TASKS) { taskId = unfinished_tasks.get(i1).getId();}
+                else { taskId = finished_tasks.get(i1).getId();}
+
+                intent.putExtra("taskId", taskId);
                 startActivity(intent);
+                return true;
             }
         });
-        finished_tasks = new ArrayList<>();
-        adapterFinished = new TaskListAdapterFinished(getActivity(), finished_tasks);
-        mFinishedTaskList.setAdapter(adapterFinished);
+        mAdapter = new TaskListAdapter(getActivity(), unfinished_tasks, finished_tasks);
+        mTaskList.setAdapter(mAdapter);
+        mTaskList.expandGroup(UNFINISHED_TASKS);
+
 
         updateTaskList();
 
@@ -233,7 +234,7 @@ public class TaskListFragment extends Fragment {
             }
         });
 
-        // 自分がオーナーの時のみタスク追加ボタンを出す (デフォルト: off)
+        // 自分がオーナーの時のみタスク追加ボタンを出す (デフォルト: gone)
         if (myId.equals(mGroup.getAdministratorId())) {
             mCreateTaskButton.setVisibility(View.VISIBLE);
         }
@@ -253,6 +254,7 @@ public class TaskListFragment extends Fragment {
         super.onResume();
         if(isMainLayout) {
             updateTaskList();
+            mCompleteTaskButton.setVisibility(View.INVISIBLE);
         }
     }
 
@@ -278,10 +280,9 @@ public class TaskListFragment extends Fragment {
                         }
                     }
 
-                    adapterUnfinished.notifyDataSetChanged();
-                    adapterFinished.notifyDataSetChanged();
+                    mAdapter.notifyDataSetChanged();
                 } else{
-                    // handle error
+                    // Todo: handle error
                     Toast.makeText(getActivity(), "タスクリストの更新に失敗しました", Toast.LENGTH_SHORT).show();
                 }
 
@@ -291,7 +292,7 @@ public class TaskListFragment extends Fragment {
     }
 
     public void onCompleteTaskButtonClicked() {
-        List<TaskListItem> items = ((TaskListAdapterUnfinished) mUnFinishedTaskList.getAdapter()).getItems();
+        List<TaskListItem> items = ((TaskListAdapter) mTaskList.getExpandableListAdapter()).getChild(UNFINISHED_TASKS);
         List<Long> checkedIds = new ArrayList<Long>();
         for (TaskListItem item : items) {
             if (item.checked) {
@@ -310,7 +311,7 @@ public class TaskListFragment extends Fragment {
     public void onChecked(boolean checked) {
         checkedCounter = 0;
         // TODO: 呼ばれるたびにインクリメント/デクリメントを用いて高速化
-        List<TaskListItem> items = ((TaskListAdapterUnfinished) mUnFinishedTaskList.getAdapter()).getItems();
+        List<TaskListItem> items = ((TaskListAdapter) mTaskList.getExpandableListAdapter()).getChild(UNFINISHED_TASKS);
         for (TaskListItem item : items) {
             if (item.checked) checkedCounter++;
         }
