@@ -8,6 +8,7 @@ import java.security.NoSuchAlgorithmException;
 import jp.fccpc.taskmanager.Managers.UserManager;
 import jp.fccpc.taskmanager.SQLite.Controller.UserDataController;
 import jp.fccpc.taskmanager.Server.EndPoint;
+import jp.fccpc.taskmanager.Server.Response;
 import jp.fccpc.taskmanager.Server.ServerConnector;
 import jp.fccpc.taskmanager.Util.JsonParser;
 import jp.fccpc.taskmanager.Values.User;
@@ -53,20 +54,15 @@ public class UserManagerImpl extends ManagerImpl implements UserManager {
         if (isOnline()) {
             ServerConnector sc = new ServerConnector(context, new ServerConnector.ServerConnectorDelegate() {
                 @Override
-                public void recieveResponse(final String responseStr) {
-                    decodeResponse(responseStr, new DecodeResponseCallback() {
-                        @Override
-                        public void success() {
-                            User u = JsonParser.users(responseStr).get(0);
-                            userDataController.updateUser(u);
-                            callback.callback(u);
-                        }
+                public void success(Response response) {
+                    User u = JsonParser.users(response.bodyJSON).get(0);
+                    userDataController.updateUser(u);
+                    callback.callback(u);
+                }
 
-                        @Override
-                        public void failure() {
-                            callback.callback(null);
-                        }
-                    });
+                @Override
+                public void failure(Response response) {
+                    callback.callback(null);
                 }
             });
 
@@ -85,18 +81,13 @@ public class UserManagerImpl extends ManagerImpl implements UserManager {
         if (isOnline()) {
             ServerConnector sc = new ServerConnector(context ,new ServerConnector.ServerConnectorDelegate() {
                 @Override
-                public void recieveResponse(final String responseStr) {
-                    decodeResponse(responseStr, new DecodeResponseCallback() {
-                        @Override
-                        public void success() {
-                            callback.callback(JsonParser.users(responseStr));
-                        }
+                public void success(Response response) {
+                    callback.callback(JsonParser.users(response.bodyJSON));
+                }
 
-                        @Override
-                        public void failure() {
-                            callback.callback(null);
-                        }
-                    });
+                @Override
+                public void failure(Response response) {
+                    callback.callback(null);
                 }
             });
 
@@ -115,18 +106,13 @@ public class UserManagerImpl extends ManagerImpl implements UserManager {
         if (isOnline()) {
             ServerConnector sc = new ServerConnector(context, new ServerConnector.ServerConnectorDelegate() {
                 @Override
-                public void recieveResponse(final String responseStr) {
-                    decodeResponse(responseStr, new DecodeResponseCallback() {
-                        @Override
-                        public void success() {
-                            callback.callback(true);
-                        }
+                public void success(Response response) {
+                    callback.callback(true);
+                }
 
-                        @Override
-                        public void failure() {
-                            callback.callback(false);
-                        }
-                    });
+                @Override
+                public void failure(Response response) {
+                    callback.callback(false);
                 }
             });
 
@@ -146,18 +132,13 @@ public class UserManagerImpl extends ManagerImpl implements UserManager {
         if (isOnline()) {
             ServerConnector sc = new ServerConnector(context, new ServerConnector.ServerConnectorDelegate() {
                 @Override
-                public void recieveResponse(final String responseStr) {
-                    decodeResponse(responseStr, new DecodeResponseCallback() {
-                        @Override
-                        public void success() {
-                            callback.callback(true);
-                        }
+                public void success(Response response) {
+                    callback.callback(true);
+                }
 
-                        @Override
-                        public void failure() {
-                            callback.callback(false);
-                        }
-                    });
+                @Override
+                public void failure(Response response) {
+                    callback.callback(false);
                 }
             });
 
@@ -177,18 +158,13 @@ public class UserManagerImpl extends ManagerImpl implements UserManager {
         if (isOnline()) {
             ServerConnector sc = new ServerConnector(context, new ServerConnector.ServerConnectorDelegate() {
                 @Override
-                public void recieveResponse(final String responseStr) {
-                    decodeResponse(responseStr, new DecodeResponseCallback() {
-                        @Override
-                        public void success() {
-                            callback.callback(true);
-                        }
+                public void success(Response response) {
+                    callback.callback(true);
+                }
 
-                        @Override
-                        public void failure() {
-                            callback.callback(false);
-                        }
-                    });
+                @Override
+                public void failure(Response response) {
+                    callback.callback(false);
                 }
             });
 

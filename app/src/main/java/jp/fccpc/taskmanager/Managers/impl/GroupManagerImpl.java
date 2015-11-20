@@ -8,6 +8,7 @@ import jp.fccpc.taskmanager.Managers.GroupManager;
 import jp.fccpc.taskmanager.Managers.UserManager;
 import jp.fccpc.taskmanager.SQLite.Controller.GroupDataController;
 import jp.fccpc.taskmanager.Server.EndPoint;
+import jp.fccpc.taskmanager.Server.Response;
 import jp.fccpc.taskmanager.Server.ServerConnector;
 import jp.fccpc.taskmanager.Util.JsonParser;
 import jp.fccpc.taskmanager.Values.Group;
@@ -29,23 +30,18 @@ public class GroupManagerImpl extends ManagerImpl implements GroupManager {
         if (isOnline()) {
             ServerConnector sc = new ServerConnector(context, new ServerConnector.ServerConnectorDelegate() {
                 @Override
-                public void recieveResponse(final String responseStr) {
-                    decodeResponse(responseStr, new DecodeResponseCallback() {
-                        @Override
-                        public void success() {
-                            List<Group> groupList = JsonParser.groups(responseStr);
-                            for (Group g : groupList) {
-                                groupDataController.updateGroup(g);
-                            }
+                public void success(Response response) {
+                    List<Group> groupList = JsonParser.groups(response.bodyJSON, response.ETag);
+                    for (Group g : groupList) {
+                        groupDataController.updateGroup(g);
+                    }
 
-                            callback.callback(groupList);
-                        }
+                    callback.callback(groupList);
+                }
 
-                        @Override
-                        public void failure() {
-                            callback.callback(null);
-                        }
-                    });
+                @Override
+                public void failure(Response response) {
+                    callback.callback(null);
                 }
             });
 
@@ -64,21 +60,16 @@ public class GroupManagerImpl extends ManagerImpl implements GroupManager {
         if (isOnline()) {
             ServerConnector sc = new ServerConnector(context, new ServerConnector.ServerConnectorDelegate() {
                 @Override
-                public void recieveResponse(final String responseStr) {
-                    decodeResponse(responseStr, new DecodeResponseCallback() {
-                        @Override
-                        public void success() {
-                            Group g = JsonParser.groups(responseStr).get(0);
-                            groupDataController.updateGroup(g);
+                public void success(Response response) {
+                    Group g = JsonParser.groups(response.bodyJSON, response.ETag).get(0);
+                    groupDataController.updateGroup(g);
 
-                            callback.callback(g);
-                        }
+                    callback.callback(g);
+                }
 
-                        @Override
-                        public void failure() {
-                            callback.callback(null);
-                        }
-                    });
+                @Override
+                public void failure(Response response) {
+                    callback.callback(null);
                 }
             });
 
@@ -123,23 +114,16 @@ public class GroupManagerImpl extends ManagerImpl implements GroupManager {
         if (isOnline()) {
             ServerConnector sc = new ServerConnector(context, new ServerConnector.ServerConnectorDelegate() {
                 @Override
-                public void recieveResponse(final String responseStr) {
-                    decodeResponse(responseStr, new DecodeResponseCallback() {
-                        @Override
-                        public void success() {
-                            List<Group> groupList = JsonParser.groups(responseStr);
-                            for (Group g : groupList) {
-                                groupDataController.updateGroup(g);
-                            }
+                public void success(Response response) {
+                    List<Group> groupList = JsonParser.groups(response.bodyJSON, response.ETag);
+                    for (Group g : groupList) {groupDataController.updateGroup(g);}
 
-                            callback.callback(groupList);
-                        }
+                    callback.callback(groupList);
+                }
 
-                        @Override
-                        public void failure() {
-                            callback.callback(null);
-                        }
-                    });
+                @Override
+                public void failure(Response response) {
+                    callback.callback(null);
                 }
             });
 
@@ -171,23 +155,16 @@ public class GroupManagerImpl extends ManagerImpl implements GroupManager {
 
                     ServerConnector sc = new ServerConnector(context, new ServerConnector.ServerConnectorDelegate() {
                         @Override
-                        public void recieveResponse(final String responseStr) {
-                            decodeResponse(responseStr, new DecodeResponseCallback() {
-                                @Override
-                                public void success() {
-                                    List<Group> groupList = JsonParser.groups(responseStr);
-                                    for (Group g : groupList) {
-                                        groupDataController.updateGroup(g);
-                                    }
+                        public void success(Response response) {
+                            List<Group> groupList = JsonParser.groups(response.bodyJSON, response.ETag);
+                            for (Group g : groupList) {groupDataController.updateGroup(g);}
 
-                                    callback.callback(groupList);
-                                }
+                            callback.callback(groupList);
+                        }
 
-                                @Override
-                                public void failure() {
-                                    callback.callback(null);
-                                }
-                            });
+                        @Override
+                        public void failure(Response response) {
+                            callback.callback(null);
                         }
                     });
 
@@ -209,18 +186,13 @@ public class GroupManagerImpl extends ManagerImpl implements GroupManager {
         if (isOnline()) {
             ServerConnector sc = new ServerConnector(context, new ServerConnector.ServerConnectorDelegate() {
                 @Override
-                public void recieveResponse(String responseStr) {
-                    decodeResponse(responseStr, new DecodeResponseCallback() {
-                        @Override
-                        public void success() {
-                            callback.callback(true);
-                        }
+                public void success(Response response) {
+                    callback.callback(true);
+                }
 
-                        @Override
-                        public void failure() {
-                            callback.callback(false);
-                        }
-                    });
+                @Override
+                public void failure(Response response) {
+                    callback.callback(false);
                 }
             });
 
@@ -240,18 +212,13 @@ public class GroupManagerImpl extends ManagerImpl implements GroupManager {
         if (isOnline()) {
             ServerConnector sc = new ServerConnector(context, new ServerConnector.ServerConnectorDelegate() {
                 @Override
-                public void recieveResponse(String responseStr) {
-                    decodeResponse(responseStr, new DecodeResponseCallback() {
-                        @Override
-                        public void success() {
-                            callback.callback(true);
-                        }
+                public void success(Response response) {
+                    callback.callback(true);
+                }
 
-                        @Override
-                        public void failure() {
-                            callback.callback(false);
-                        }
-                    });
+                @Override
+                public void failure(Response response) {
+                    callback.callback(false);
                 }
             });
 
@@ -271,18 +238,13 @@ public class GroupManagerImpl extends ManagerImpl implements GroupManager {
         if (isOnline()) {
             ServerConnector sc = new ServerConnector(context, new ServerConnector.ServerConnectorDelegate() {
                 @Override
-                public void recieveResponse(String responseStr) {
-                    decodeResponse(responseStr, new DecodeResponseCallback() {
-                        @Override
-                        public void success() {
-                            callback.callback(true);
-                        }
+                public void success(Response response) {
+                    callback.callback(true);
+                }
 
-                        @Override
-                        public void failure() {
-                            callback.callback(false);
-                        }
-                    });
+                @Override
+                public void failure(Response response) {
+                    callback.callback(false);
                 }
             });
 

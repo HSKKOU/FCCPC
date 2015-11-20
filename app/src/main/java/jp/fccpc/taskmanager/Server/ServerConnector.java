@@ -19,9 +19,11 @@ import jp.fccpc.taskmanager.SQLite.Controller.UserDataController;
 /**
  * Created by hskk1120551 on 2015/10/16.
  */
-public class ServerConnector extends AsyncTask<String, Integer, String> {
+public class ServerConnector extends AsyncTask<String, Integer, Response> {
+
     public interface ServerConnectorDelegate {
-        void recieveResponse(String responseStr);
+        void success(Response response);
+        void failure(Response response);
     }
 
     public static final String GET = "GET";         // 取得
@@ -87,10 +89,12 @@ public class ServerConnector extends AsyncTask<String, Integer, String> {
     }
 
 
-    private String response2str(HttpURLConnection con) throws IOException {
+    private Response decodeResponse(HttpURLConnection con) throws IOException {
         int responseCode = con.getResponseCode();
 
         InputStream is = null;
+
+        Log.d(TAG, "response code : " + responseCode);
 
         if (responseCode / 100 == 4 || responseCode / 100 == 5) {
             return this.failResponse(con);
@@ -99,18 +103,25 @@ public class ServerConnector extends AsyncTask<String, Integer, String> {
         }
     }
 
-    private String successResponse(HttpURLConnection con) throws IOException {
+    private Response successResponse(HttpURLConnection con) throws IOException {
         InputStream is = con.getInputStream();
         BufferedReader br = new BufferedReader(new InputStreamReader(is, CHAR_SET));
-        return this.buf2str(br);
+
+//        Map<String,List<String>> headers = con.getHeaderFields();
+//        for(String key : headers.keySet()) {
+//            Log.d(TAG, "key: " + key + ", value: " + headers.get(key));
+//        }
+
+        // TODO: implement ETag
+        return new Response(this.buf2str(br), "ETag");
     }
 
-    private String failResponse(HttpURLConnection con) throws IOException {
+    private Response failResponse(HttpURLConnection con) throws IOException {
 //        InputStream errIS = con.getErrorStream();
 //        BufferedReader br = new BufferedReader(new InputStreamReader(errIS, CHAR_SET));
 //        return this.buf2str(br);
         // TODO: error handlers
-        return "err";
+        return new Response("err", null);
     }
 
     private String buf2str(BufferedReader br) throws IOException {
@@ -140,7 +151,7 @@ public class ServerConnector extends AsyncTask<String, Integer, String> {
     }
 
     @Override
-    protected String doInBackground(String... params) {
+    protected Response doInBackground(String... params) {
         String endPointStr = params[0];
         String methodStr = params[1];
         String paramsStr = params[2];
@@ -166,7 +177,7 @@ public class ServerConnector extends AsyncTask<String, Integer, String> {
                 return null;
             }
 
-            return this.response2str(con);
+            return this.decodeResponse(con);
         } catch (IOException e) {
             Log.d(TAG, e.toString());
         }
@@ -175,8 +186,13 @@ public class ServerConnector extends AsyncTask<String, Integer, String> {
     }
 
     @Override
-    protected void onPostExecute(String s) {
-        Log.d(TAG, s);
-        this.delegate.recieveResponse(s);
+    protected void onPostExecute(Response r) {
+        if(r != null) Log.d(TAG, r.toString());
+
+        if("err".equals(r.bodyJSON)) {
+            this.delegate.failure(r);
+        } else {
+            this.delegate.success(r);
+        }
     }
 }

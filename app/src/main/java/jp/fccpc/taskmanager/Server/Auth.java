@@ -29,30 +29,20 @@ public class Auth {
     public static void login(final Context context, final String userName, String password, final AuthCallback callback) {
         ServerConnector sc = new ServerConnector(context, new ServerConnector.ServerConnectorDelegate() {
             @Override
-            public void recieveResponse(String responseStr) {
-                Log.d(TAG, responseStr);
-                boolean success = true;
-                String data = "";
-
-                // TODO: error handlers
-                if("err".equals(responseStr)) {
-                    success = false;
-                    data = "error";
-                    callback.recieveResponse(success, data);
-                    return;
-                }
-
-                success = true;
-                data = "login succeed";
-
+            public void success(Response response) {
                 // store token
-                String token = JsonParser.loginToken(responseStr);
+                String token = JsonParser.loginToken(response.bodyJSON);
                 Log.d(TAG, token);
 
                 UserDataController udc = new UserDataController(context);
                 udc.updateToken(token);
 
-                callback.recieveResponse(success, data);
+                callback.recieveResponse(true, "login succeed");
+            }
+
+            @Override
+            public void failure(Response response) {
+                callback.recieveResponse(false, response.bodyJSON);
             }
         });
 
