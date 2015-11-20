@@ -7,7 +7,7 @@
 
     <!-- login activity -->
     <string name="login_button">ログイン</string>
-    <string name="login_prompt_password">*****</string>
+    <string name="login_prompt_password">Password</string>
     <string name="login_prompt_user_id">User Id</string>
     <string name="action_sign_in_short">short sign in</string>
 
@@ -66,4 +66,9 @@
 
     <!-- user search dialog -->
     <string name="user_search_already_added">追加済み</string>
+    <string name="title_activity_sign_up">Sign up</string>
+    <string name="signup_button">新規ユーザー登録</string>
+    <string name="signup_button_text">登録</string>
+    <string name="login_prompt_user_email">Email</string>
+    <string name="login_prompt_password_confirm">Confirm Password</string>
 </resources>

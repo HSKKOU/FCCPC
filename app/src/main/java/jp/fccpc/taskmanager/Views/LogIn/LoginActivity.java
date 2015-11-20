@@ -14,12 +14,13 @@ import jp.fccpc.taskmanager.R;
 import jp.fccpc.taskmanager.SQLite.Controller.UserDataController;
 import jp.fccpc.taskmanager.Values.User;
 import jp.fccpc.taskmanager.Views.MainActivity;
+import jp.fccpc.taskmanager.Views.SignUp.SignUpActivity;
 
 /**
  * Created by tm on 2015/11/11.
  */
 public class LoginActivity extends Activity {
-    private Button mLoginButton;
+    private Button mLoginButton,mSignUpButton;
     private EditText mUserIdText,mPasswordText;
 
     @Override
@@ -50,6 +51,14 @@ public class LoginActivity extends Activity {
                 login(userId,password);
             }
         });
+
+        mSignUpButton = (Button) findViewById(R.id.signup_button);
+        mSignUpButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                move2SignUp();
+            }
+        });
     }
 
     private void login(String userName,String password){
@@ -57,16 +66,21 @@ public class LoginActivity extends Activity {
         am.login(this, userName, password, new AuthManager.Callback() {
             @Override
             public void recieveResponse(boolean success, String data) {
-                if(success){
+                if (success) {
                     move2Main();
-                }else{
-                    Toast.makeText(getBaseContext(),data,Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(getBaseContext(), data, Toast.LENGTH_LONG).show();
                 }
             }
         });
     }
     private void move2Main(){
         Intent i = new Intent(this, MainActivity.class);
+        startActivity(i);
+    }
+
+    private void move2SignUp(){
+        Intent i = new Intent(this, SignUpActivity.class);
         startActivity(i);
     }
 }
