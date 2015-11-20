@@ -29,11 +29,23 @@ public class GroupManagerImpl extends ManagerImpl implements GroupManager {
         if (isOnline()) {
             ServerConnector sc = new ServerConnector(context, new ServerConnector.ServerConnectorDelegate() {
                 @Override
-                public void recieveResponse(String responseStr) {
-                    List<Group> groupList = JsonParser.groups(responseStr);
-                    for(Group g : groupList) { groupDataController.updateGroup(g); }
+                public void recieveResponse(final String responseStr) {
+                    decodeResponse(responseStr, new DecodeResponseCallback() {
+                        @Override
+                        public void success() {
+                            List<Group> groupList = JsonParser.groups(responseStr);
+                            for (Group g : groupList) {
+                                groupDataController.updateGroup(g);
+                            }
 
-                    callback.callback(groupList);
+                            callback.callback(groupList);
+                        }
+
+                        @Override
+                        public void failure() {
+                            callback.callback(null);
+                        }
+                    });
                 }
             });
 
@@ -52,11 +64,21 @@ public class GroupManagerImpl extends ManagerImpl implements GroupManager {
         if (isOnline()) {
             ServerConnector sc = new ServerConnector(context, new ServerConnector.ServerConnectorDelegate() {
                 @Override
-                public void recieveResponse(String responseStr) {
-                    Group g = JsonParser.groups(responseStr).get(0);
-                    groupDataController.updateGroup(g);
+                public void recieveResponse(final String responseStr) {
+                    decodeResponse(responseStr, new DecodeResponseCallback() {
+                        @Override
+                        public void success() {
+                            Group g = JsonParser.groups(responseStr).get(0);
+                            groupDataController.updateGroup(g);
 
-                    callback.callback(g);
+                            callback.callback(g);
+                        }
+
+                        @Override
+                        public void failure() {
+                            callback.callback(null);
+                        }
+                    });
                 }
             });
 
@@ -101,11 +123,23 @@ public class GroupManagerImpl extends ManagerImpl implements GroupManager {
         if (isOnline()) {
             ServerConnector sc = new ServerConnector(context, new ServerConnector.ServerConnectorDelegate() {
                 @Override
-                public void recieveResponse(String responseStr) {
-                    List<Group> groupList = JsonParser.groups(responseStr);
-                    for(Group g : groupList) { groupDataController.updateGroup(g); }
+                public void recieveResponse(final String responseStr) {
+                    decodeResponse(responseStr, new DecodeResponseCallback() {
+                        @Override
+                        public void success() {
+                            List<Group> groupList = JsonParser.groups(responseStr);
+                            for (Group g : groupList) {
+                                groupDataController.updateGroup(g);
+                            }
 
-                    callback.callback(groupList);
+                            callback.callback(groupList);
+                        }
+
+                        @Override
+                        public void failure() {
+                            callback.callback(null);
+                        }
+                    });
                 }
             });
 
@@ -128,7 +162,7 @@ public class GroupManagerImpl extends ManagerImpl implements GroupManager {
             um.searchUser(adminName, new UserManager.UserListCallback() {
                 @Override
                 public void callback(List<User> userList) {
-                    if(userList.size() == 0) {
+                    if(userList == null || userList.size() == 0) {
                         callback.callback(null);
                         return;
                     }
@@ -137,13 +171,23 @@ public class GroupManagerImpl extends ManagerImpl implements GroupManager {
 
                     ServerConnector sc = new ServerConnector(context, new ServerConnector.ServerConnectorDelegate() {
                         @Override
-                        public void recieveResponse(String responseStr) {
-                            List<Group> groupList = JsonParser.groups(responseStr);
-                            for (Group g : groupList) {
-                                groupDataController.updateGroup(g);
-                            }
+                        public void recieveResponse(final String responseStr) {
+                            decodeResponse(responseStr, new DecodeResponseCallback() {
+                                @Override
+                                public void success() {
+                                    List<Group> groupList = JsonParser.groups(responseStr);
+                                    for (Group g : groupList) {
+                                        groupDataController.updateGroup(g);
+                                    }
 
-                            callback.callback(groupList);
+                                    callback.callback(groupList);
+                                }
+
+                                @Override
+                                public void failure() {
+                                    callback.callback(null);
+                                }
+                            });
                         }
                     });
 
@@ -166,7 +210,17 @@ public class GroupManagerImpl extends ManagerImpl implements GroupManager {
             ServerConnector sc = new ServerConnector(context, new ServerConnector.ServerConnectorDelegate() {
                 @Override
                 public void recieveResponse(String responseStr) {
-                    callback.callback(true);
+                    decodeResponse(responseStr, new DecodeResponseCallback() {
+                        @Override
+                        public void success() {
+                            callback.callback(true);
+                        }
+
+                        @Override
+                        public void failure() {
+                            callback.callback(false);
+                        }
+                    });
                 }
             });
 
@@ -187,7 +241,17 @@ public class GroupManagerImpl extends ManagerImpl implements GroupManager {
             ServerConnector sc = new ServerConnector(context, new ServerConnector.ServerConnectorDelegate() {
                 @Override
                 public void recieveResponse(String responseStr) {
-                    callback.callback(true);
+                    decodeResponse(responseStr, new DecodeResponseCallback() {
+                        @Override
+                        public void success() {
+                            callback.callback(true);
+                        }
+
+                        @Override
+                        public void failure() {
+                            callback.callback(false);
+                        }
+                    });
                 }
             });
 
@@ -208,7 +272,17 @@ public class GroupManagerImpl extends ManagerImpl implements GroupManager {
             ServerConnector sc = new ServerConnector(context, new ServerConnector.ServerConnectorDelegate() {
                 @Override
                 public void recieveResponse(String responseStr) {
-                    callback.callback(true);
+                    decodeResponse(responseStr, new DecodeResponseCallback() {
+                        @Override
+                        public void success() {
+                            callback.callback(true);
+                        }
+
+                        @Override
+                        public void failure() {
+                            callback.callback(false);
+                        }
+                    });
                 }
             });
 
