@@ -98,7 +98,7 @@ public class GroupDataController extends SQLiteDataController {
                 c.getLong(c.getColumnIndex(KEY_ID)),
                 c.getString(c.getColumnIndex(KEY_NAME)),
                 c.getLong(c.getColumnIndex(KEY_ADMIN_ID)),
-                JsonParser.memberships(c.getString(c.getColumnIndex(KEY_MEMBERSHIPS))),
+                JsonParser.memberships(c.getString(c.getColumnIndex(KEY_MEMBERSHIPS)), null),
                 c.getLong(c.getColumnIndex(KEY_UPDATED_AT)),
                 c.getString(c.getColumnIndex(KEY_ETAG))
         );

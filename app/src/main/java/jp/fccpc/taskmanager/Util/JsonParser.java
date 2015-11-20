@@ -21,7 +21,7 @@ import jp.fccpc.taskmanager.Values.User;
 public class JsonParser {
     private static final String TAG = JsonParser.class.getSimpleName();
 
-    static public List<Task> tasks(String json) {
+    static public List<Task> tasks(String json, String eTag) {
         List<Task> taskList = new ArrayList<Task>();
 
         JSONArray ja = str2JsonArray(json);
@@ -41,7 +41,7 @@ public class JsonParser {
                         getLongJSON(jo, "created_at"),
                         getLongJSON(jo, "updated_at"),
                         getLongJSON(jo, "done_at"),
-                        ""
+                        eTag
                 );
                 taskList.add(t);
             }
@@ -51,7 +51,7 @@ public class JsonParser {
 
         return taskList;
     }
-    static public List<Group> groups(String json) {
+    static public List<Group> groups(String json, String eTag) {
         List<Group> groupList = new ArrayList<Group>();
 
         JSONArray ja = str2JsonArray(json);
@@ -65,9 +65,9 @@ public class JsonParser {
                         getLongJSON(jo, "id"),
                         getStringJSON(jo, "name"),
                         getLongJSON(jo, "administrator"),
-                        JsonParser.memberships(getStringJSON(jo, "memberships")),
+                        JsonParser.memberships(getStringJSON(jo, "memberships"), eTag),
                         getLongJSON(jo, "updated_at"),
-                        ""
+                        eTag
                 );
                 groupList.add(g);
             }
@@ -100,7 +100,7 @@ public class JsonParser {
 
         return userList;
     }
-    static public List<Membership> memberships(String json) {
+    static public List<Membership> memberships(String json, String eTag) {
         List<Membership> memberList = new ArrayList<Membership>();
 
         JSONArray ja = str2JsonArray(json);
@@ -116,7 +116,7 @@ public class JsonParser {
                         getLongJSON(jo, "user_id"),
                         getBoolJSON(jo, "group_agreed"),
                         getBoolJSON(jo, "user_agreed"),
-                        ""
+                        eTag
                 );
                 memberList.add(m);
             }
