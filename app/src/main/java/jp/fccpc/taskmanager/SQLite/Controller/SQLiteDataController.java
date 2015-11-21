@@ -31,7 +31,8 @@ public class SQLiteDataController {
 
     protected long updateModel(ContentValues _v, String idStr){
         long id = 0;
-        Cursor c = dbHelper.getReadableDatabase().query(this.tableName,
+        db = dbHelper.getReadableDatabase();
+        Cursor c = db.query(this.tableName,
                 new String[]{KEY_ID},
                 KEY_ID + " = ?",
                 new String[]{idStr},

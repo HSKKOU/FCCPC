@@ -69,14 +69,16 @@ public class TaskDataController extends SQLiteDataController {
                 null,
                 null);
 
+        Task t = null;
+
         if(c != null){
             c.moveToFirst();
-            return this.cursor2task(c);
+            t = this.cursor2task(c);
         }
 
         db.close();
 
-        return null;
+        return t;
     }
 
     public void deleteTask(Task task) {

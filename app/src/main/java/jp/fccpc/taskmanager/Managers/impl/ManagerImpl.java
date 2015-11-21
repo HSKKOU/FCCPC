@@ -10,11 +10,6 @@ import java.net.URLEncoder;
  */
 public class ManagerImpl {
 
-    protected interface DecodeResponseCallback{
-        void success();
-        void failure();
-    }
-
     protected Context context;
 
     ManagerImpl(Context context) {
@@ -37,18 +32,13 @@ public class ManagerImpl {
 
     protected String makeParamsString(String[] keys, String[] values) {
         String paramsString = "";
-        for (int i = 0; i < Math.min(keys.length, values.length); i++) {
-            paramsString += encode(keys[i]) + "=" + encode(values[i]);
+        if(keys.length == 0 || values.length == 0) { return paramsString; }
+
+        paramsString += encode(keys[0]) + "=" + encode(values[0]);
+        for (int i = 1; i < Math.min(keys.length, values.length); i++) {
+            paramsString += "&" + encode(keys[i]) + "=" + encode(values[i]);
         }
 
         return paramsString;
-    }
-
-    protected void decodeResponse(String response, DecodeResponseCallback callback) {
-        if("err".equals(response)) {
-            callback.failure();
-        } else {
-            callback.success();
-        }
     }
 }

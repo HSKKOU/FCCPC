@@ -12,6 +12,7 @@ import jp.fccpc.taskmanager.Server.Response;
 import jp.fccpc.taskmanager.Server.ServerConnector;
 import jp.fccpc.taskmanager.Util.JsonParser;
 import jp.fccpc.taskmanager.Values.Group;
+import jp.fccpc.taskmanager.Values.Membership;
 import jp.fccpc.taskmanager.Values.User;
 
 /**
@@ -187,7 +188,12 @@ public class GroupManagerImpl extends ManagerImpl implements GroupManager {
             ServerConnector sc = new ServerConnector(context, new ServerConnector.ServerConnectorDelegate() {
                 @Override
                 public void success(Response response) {
-                    callback.callback(true);
+                    createMemberships(group.getMemberships(), new Callback() {
+                        @Override
+                        public void callback(boolean success) {
+                            callback.callback(success);
+                        }
+                    });
                 }
 
                 @Override
@@ -249,6 +255,117 @@ public class GroupManagerImpl extends ManagerImpl implements GroupManager {
             });
 
             String endPoint = EndPoint.group(groupId);
+            String method = ServerConnector.DELETE;
+            String params = null;
+
+            sc.execute(endPoint, method, params, null);
+        } else {
+            callback.callback(false);
+        }
+    }
+
+    @Override
+    public void createMembership(Membership membership, final Callback callback) {
+        if(membership.isGroupAgreed() && membership.isUserAgreed()) {
+            callback.callback(false);
+            return;
+        }
+
+        if (isOnline()) {
+            ServerConnector sc = new ServerConnector(context, new ServerConnector.ServerConnectorDelegate() {
+                @Override
+                public void success(Response response) {
+                    callback.callback(true);
+                }
+
+                @Override
+                public void failure(Response response) {
+                    callback.callback(false);
+                }
+            });
+
+            // TODO: check endpoint
+            String endPoint = EndPoint.membership(membership.getGroupId(), membership.getUserId());
+            String method = ServerConnector.POST;
+            String params = makeParamsString(
+                    new String[]{"group_agreed", "user_agreed"},
+                    new String[]{String.valueOf(membership.isGroupAgreed()), String.valueOf(membership.isUserAgreed())});
+
+            sc.execute(endPoint, method, params, null);
+        } else {
+            callback.callback(false);
+        }
+    }
+
+
+    // TODO: should fix multi thread
+    private int finished = 0;
+    @Override
+    public void createMemberships(List<Membership> memberships, final Callback callback) {
+        if(memberships.size() == 0) {
+            callback.callback(true);
+            return;
+        }
+
+        finished = 0;
+
+        final int membershipLength = memberships.size();
+        for(Membership m : memberships) {
+            createMembership(m, new Callback() {
+                @Override
+                public void callback(boolean success) {
+                    finished++;
+                    if(finished == membershipLength) {
+                        callback.callback(true);
+                    }
+                }
+            });
+        }
+    }
+
+    @Override
+    public void updateMembership(Membership membership, final Callback callback) {
+        if (isOnline()) {
+            ServerConnector sc = new ServerConnector(context, new ServerConnector.ServerConnectorDelegate() {
+                @Override
+                public void success(Response response) {
+                    callback.callback(true);
+                }
+
+                @Override
+                public void failure(Response response) {
+                    callback.callback(false);
+                }
+            });
+
+            String endPoint = EndPoint.membership(membership.getGroupId(), membership.getUserId());
+            String method = ServerConnector.PUT;
+            String params = makeParamsString(
+                    new String[]{"group_agreed", "user_agreed"},
+                    new String[]{String.valueOf(membership.isGroupAgreed()), String.valueOf(membership.isUserAgreed())});
+
+            sc.execute(endPoint, method, params, null);
+        } else {
+            callback.callback(false);
+        }
+    }
+
+    @Override
+    public void deleteMembership(Membership membership, final Callback callback) {
+        if (isOnline()) {
+            ServerConnector sc = new ServerConnector(context, new ServerConnector.ServerConnectorDelegate() {
+                @Override
+                public void success(Response response) {
+                    callback.callback(true);
+                }
+
+                @Override
+                public void failure(Response response) {
+                    callback.callback(false);
+                }
+            });
+
+            String endPoint = EndPoint.membership(membership.getGroupId(), membership.getUserId());
             String method = ServerConnector.DELETE;
             String params = null;
 
