@@ -9,15 +9,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 
-import java.util.List;
-
-import jp.fccpc.taskmanager.Managers.App;
-import jp.fccpc.taskmanager.Managers.GroupManager;
 import jp.fccpc.taskmanager.R;
-import jp.fccpc.taskmanager.Values.Group;
 import jp.fccpc.taskmanager.Views.GroupList.GroupAddActivity;
 import jp.fccpc.taskmanager.Views.GroupList.GroupCreateActivity;
-import jp.fccpc.taskmanager.Views.GroupList.GroupDetailActivity;
 import jp.fccpc.taskmanager.Views.GroupList.GroupListFragment;
 import jp.fccpc.taskmanager.Views.TaskList.TaskListFragment;
 import jp.fccpc.taskmanager.Views.UserAccountInfo.UserAccountFragment;
@@ -30,27 +24,26 @@ public class MainActivity extends AppCompatActivity
     Menu mMenu;
 
     private GroupListFragment mGroupListFragment;
-    private Long mCurrentGroupId = -1L;
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
         mMenu = menu;
-        menu.findItem(R.id.menu_group_detail).setVisible(false);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch(item.getItemId()){
-            case R.id.menu_group_detail:
-                // Todo: improve this
-                // ユーザー情報画面なら何もしない
-                if(mCurrentGroupId == -1) {return true;}
+            case R.id.menu_user_info:
+                mGroupListFragment.clearSelection();
 
-                final Intent intent = new Intent(MainActivity.this, GroupDetailActivity.class);
-                intent.putExtra("GroupId", mCurrentGroupId);
-                startActivity(intent);
+                Bundle arguments = new Bundle();
+                UserAccountFragment fragment = new UserAccountFragment();
+                fragment.setArguments(arguments);
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.item_detail_container, fragment)
+                        .commit();
                 return true;
             default:
                 return false;
@@ -80,29 +73,6 @@ public class MainActivity extends AppCompatActivity
         mGroupListFragment = ((GroupListFragment) getSupportFragmentManager().findFragmentById(R.id.item_list));
         mGroupListFragment.setActivateOnItemClick(true);
 
-
-        Button mUserButton = (Button) findViewById(R.id.show_user_button);
-        mUserButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                // Todo: グループ一覧のフォーカスを外す (not work)
-                // mGroupListFragment.getView().setSelected(false);
-
-                // hide menubar
-                mMenu.findItem(R.id.menu_group_detail).setVisible(false);
-
-                mCurrentGroupId = -1L;
-                mToolbar.setTitle("ユーザー情報");
-
-                Bundle arguments = new Bundle();
-                UserAccountFragment fragment = new UserAccountFragment();
-                fragment.setArguments(arguments);
-                getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.item_detail_container, fragment)
-                        .commit();
-            }
-        });
-
         Button mCreateGroupButton = (Button) findViewById(R.id.create_group_button);
         mCreateGroupButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -121,10 +91,13 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
+        openTaskList(0);
+        mGroupListFragment.getListView().setItemChecked(0, true);
     }
 
     @Override
-    protected void onResume() {
+    protected void onResume()
+    {
         super.onResume();
     }
 
@@ -135,16 +108,18 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onItemSelected(int position){
         // change Toolbar name and show menubar
-        final int i = position;
-        App.get().getGroupManager().getList(new GroupManager.GroupListCallback() {
-            @Override
-            public void callback(List<Group> groupList) {
-                mToolbar.setTitle(groupList.get(i).getName());
-                mCurrentGroupId = groupList.get(i).getGroupId();
-                mMenu.findItem(R.id.menu_group_detail).setVisible(true);
-            }
-        });
+//        final int i = position;
+//        App.get().getGroupManager().getList(new GroupManager.GroupListCallback() {
+//            @Override
+//            public void callback(List<Group> groupList) {
+//                mToolbar.setTitle(getResources().getString(R.string.app_name) + "(" +  groupList.get(i).getName() + ")");
+//            }
+//        });
 
+        openTaskList(position);
+    }
+
+    private void openTaskList(int position){
         // set task list fragment
         Bundle arguments = new Bundle();
         arguments.putInt(TaskListFragment.ARG_POSITION, position);
