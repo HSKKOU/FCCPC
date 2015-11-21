@@ -22,13 +22,6 @@
         android:layout_weight="1"
         >
 
-        <Button
-            android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:text="@string/user_account_button_text"
-            android:id="@+id/show_user_button"
-            android:background="#dd5522" />
-
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -65,14 +58,6 @@
 
         </RelativeLayout>
 
-        <!--
-        <View
-            android:layout_width="fill_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:background="#ff694937"
-            />
-        -->
 
     </LinearLayout>
 
@@ -80,7 +65,7 @@
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="3"
-        android:background="#aaccaa"
+        android:background="@color/listview_background"
         />
 
 </LinearLayout>

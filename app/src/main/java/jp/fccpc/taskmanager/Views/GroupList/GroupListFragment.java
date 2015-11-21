@@ -13,6 +13,7 @@ import java.util.List;
 
 import jp.fccpc.taskmanager.Managers.App;
 import jp.fccpc.taskmanager.Managers.GroupManager;
+import jp.fccpc.taskmanager.R;
 import jp.fccpc.taskmanager.Values.Group;
 import jp.fccpc.taskmanager.Views.TaskList.TaskListFragment;
 
@@ -85,8 +86,10 @@ public class GroupListFragment extends ListFragment {
         GroupNames = new ArrayList<>();
         adapterGroup = new ArrayAdapter<String>(
                 getActivity(),
-                android.R.layout.simple_expandable_list_item_1,
-                android.R.id.text1,
+                //android.R.layout.simple_expandable_list_item_1,
+                //android.R.layout.simple_list_item_activated_1,
+                R.layout.list_item_group,
+                R.id.group_list_item,
                 GroupNames);
         setListAdapter(adapterGroup);
     }
@@ -98,13 +101,7 @@ public class GroupListFragment extends ListFragment {
         if (savedInstanceState != null
                 && savedInstanceState.containsKey(STATE_ACTIVATED_POSITION)) {
             setActivatedPosition(savedInstanceState.getInt(STATE_ACTIVATED_POSITION));
-        } else {
-            // Todo: set first item when app launched (not work)
-            getListView().setItemChecked(0, true);
         }
-
-        // Todo: set selector (not work well)
-        // getListView().setSelector(R.drawable.group_list_item);
     }
 
     @Override
@@ -127,14 +124,23 @@ public class GroupListFragment extends ListFragment {
         mCallbacks = sDummyCallbacks;
     }
 
+    private int prevPosition = ListView.INVALID_POSITION;
     @Override
     public void onListItemClick(ListView listView, View view, int position, long id) {
         super.onListItemClick(listView, view, position, id);
 
-        // Notify the active callbacks interface (the activity, if the
-        // fragment is attached to one) that an item has been selected.
-        view.setSelected(true);
+        listView.setItemChecked(position, true);
+        listView.setSelected(true);
+        listView.setSelection(position);
+
+        prevPosition = position;
         mCallbacks.onItemSelected(position);
+    }
+
+    public void clearSelection(){
+        if(prevPosition != ListView.INVALID_POSITION){
+            getListView().setItemChecked(prevPosition, false);
+        }
     }
 
     @Override

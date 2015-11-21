@@ -49,6 +49,8 @@ public class TaskDetailActivity extends AppCompatActivity {
     private int loaded_num = 0;
     private boolean isLoadingBoardItems;
 
+    private boolean isOwner;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,6 +58,7 @@ public class TaskDetailActivity extends AppCompatActivity {
         setContentView(R.layout.activity_task_detail);
 
         taskId = getIntent().getLongExtra("taskId", 0L);
+        isOwner = getIntent().getBooleanExtra("isOwner", false);
 
         isLoadingBoardItems = false;
 
