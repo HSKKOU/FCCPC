@@ -3,19 +3,17 @@ package jp.fccpc.taskmanager.SQLite.Controller;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import jp.fccpc.taskmanager.Util.JsonParser;
 import jp.fccpc.taskmanager.Values.Group;
+import jp.fccpc.taskmanager.Values.Membership;
 
 import static jp.fccpc.taskmanager.SQLite.Controller.DBOpenHelper.GROUP_COLUMNS;
 import static jp.fccpc.taskmanager.SQLite.Controller.DBOpenHelper.KEY_ADMIN_ID;
 import static jp.fccpc.taskmanager.SQLite.Controller.DBOpenHelper.KEY_ETAG;
 import static jp.fccpc.taskmanager.SQLite.Controller.DBOpenHelper.KEY_ID;
-import static jp.fccpc.taskmanager.SQLite.Controller.DBOpenHelper.KEY_MEMBERSHIPS;
 import static jp.fccpc.taskmanager.SQLite.Controller.DBOpenHelper.KEY_NAME;
 import static jp.fccpc.taskmanager.SQLite.Controller.DBOpenHelper.KEY_UPDATED_AT;
 import static jp.fccpc.taskmanager.SQLite.Controller.DBOpenHelper.TABLE_GROUP;
@@ -26,36 +24,49 @@ import static jp.fccpc.taskmanager.SQLite.Controller.DBOpenHelper.TABLE_GROUP;
 public class GroupDataController extends SQLiteDataController {
     private static final String TAG = GroupDataController.class.getSimpleName();
 
-    public GroupDataController(Context context) { super(context, TABLE_GROUP); }
+    private MembershipDataController mdc;
+
+    public GroupDataController(Context context) {
+        super(context, TABLE_GROUP);
+        this.mdc = new MembershipDataController(context);
+    }
 
     public long createGroup(Group group){
         ContentValues v = new ContentValues();
         v.put(KEY_ID, group.getGroupId());
         v.put(KEY_NAME, group.getName());
         v.put(KEY_ADMIN_ID, group.getAdministratorId());
-        v.put(KEY_MEMBERSHIPS, JsonParser.membership2str(group.getMemberships()));
         v.put(KEY_UPDATED_AT, group.getUpdatedAt());
         v.put(KEY_ETAG, group.getETag());
-        return this.createModel(v);
+        long id = this.createModel(v);
+
+        this.mdc.createMemberships(group.getMemberships());
+
+        return id;
     }
 
     public Group getGroup(Long id) {
-        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        db = dbHelper.getReadableDatabase();
         Cursor c = db.query(TABLE_GROUP,
                 GROUP_COLUMNS,
                 KEY_ID + " = ?",
-                new String[] { String.valueOf(id) },
+                new String[]{String.valueOf(id)},
                 null,
                 null,
                 null,
                 null);
 
-        if(c != null){
-            c.moveToFirst();
-            return this.cursor2group(c);
+        if(c == null){
+            db.close();
+            return null;
         }
 
-        return null;
+        c.moveToFirst();
+        Group g = this.cursor2group(c);
+
+        db.close();
+
+        return g;
     }
 
     public List<Group> getAllGroups() {
@@ -71,36 +82,40 @@ public class GroupDataController extends SQLiteDataController {
             } while (c.moveToNext());
         }
 
+        db.close();
+
         return groupList;
     }
 
     public void deleteGroup(Group group) {
         this.deleteModel(String.valueOf(group.getGroupId()));
+        List<Membership> mList = this.mdc.getMembershipsByGroupId(group.getGroupId());
+        for(Membership m : mList) {
+            this.mdc.deleteMembership(m);
+        }
     }
 
     public long updateGroup(Group group) {
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
-
         ContentValues values = new ContentValues();
         values.put(KEY_ID, group.getGroupId());
         values.put(KEY_NAME, group.getName());
         values.put(KEY_ADMIN_ID, group.getAdministratorId());
-        values.put(KEY_MEMBERSHIPS, JsonParser.membership2str(group.getMemberships()));
         values.put(KEY_UPDATED_AT, group.getUpdatedAt());
         values.put(KEY_ETAG, group.getETag());
 
         return this.updateModel(values, String.valueOf(group.getGroupId()));
     }
 
-    private Group cursor2group(Cursor c) {
-        if(c.getCount() == 0) {return null;}
+    private Group cursor2group(Cursor gc) {
+        if(gc.getCount() == 0) {return null;}
+        Long id = gc.getLong(gc.getColumnIndex(KEY_ID));
         Group g = new Group(
-                c.getLong(c.getColumnIndex(KEY_ID)),
-                c.getString(c.getColumnIndex(KEY_NAME)),
-                c.getLong(c.getColumnIndex(KEY_ADMIN_ID)),
-                JsonParser.memberships(c.getString(c.getColumnIndex(KEY_MEMBERSHIPS)), null),
-                c.getLong(c.getColumnIndex(KEY_UPDATED_AT)),
-                c.getString(c.getColumnIndex(KEY_ETAG))
+                id,
+                gc.getString(gc.getColumnIndex(KEY_NAME)),
+                gc.getLong(gc.getColumnIndex(KEY_ADMIN_ID)),
+                this.mdc.getMembershipsByGroupId(id),
+                gc.getLong(gc.getColumnIndex(KEY_UPDATED_AT)),
+                gc.getString(gc.getColumnIndex(KEY_ETAG))
         );
 
         return g;
