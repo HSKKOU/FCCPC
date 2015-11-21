@@ -3,6 +3,7 @@ package jp.fccpc.taskmanager.Managers;
 import java.util.List;
 
 import jp.fccpc.taskmanager.Values.Group;
+import jp.fccpc.taskmanager.Values.Membership;
 
 /**
  * Created by nakac on 15/10/22.
@@ -27,4 +28,12 @@ public interface GroupManager {
     void update(Group group, Callback callback);
 
     void delete(Long groupId, Callback callback);
+
+    void createMembership(Membership membership, Callback callback);
+
+    void createMemberships(List<Membership> memberships, Callback callback);
+
+    void updateMembership(Membership membership, Callback callback);
+
+    void deleteMembership(Membership membership, Callback callback);
 }

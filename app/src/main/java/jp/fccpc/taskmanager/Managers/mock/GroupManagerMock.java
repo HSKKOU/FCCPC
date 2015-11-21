@@ -272,4 +272,24 @@ public class GroupManagerMock implements GroupManager {
         delete(groupId);
         callback.callback(true);
     }
+
+    @Override
+    public void createMembership(Membership membership, Callback callback) {
+
+    }
+
+    @Override
+    public void createMemberships(List<Membership> memberships, Callback callback) {
+
+    }
+
+    @Override
+    public void updateMembership(Membership membership, Callback callback) {
+
+    }
+
+    @Override
+    public void deleteMembership(Membership membership, Callback callback) {
+
+    }
 }
