@@ -4,8 +4,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".MainActivity">
     <item
-        android:id="@+id/menu_group_detail"
-        android:title="@string/menu_group_detail"
+        android:id="@+id/menu_user_info"
+        android:title="ユーザーアカウント"
         android:orderInCategory="100"
-        app:showAsAction="never" />
+        android:icon="@mipmap/ic_perm_identity_black_24dp"
+        app:showAsAction="always" />
 </menu>

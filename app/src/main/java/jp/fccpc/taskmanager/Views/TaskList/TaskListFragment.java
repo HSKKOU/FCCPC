@@ -26,6 +26,7 @@ import jp.fccpc.taskmanager.Values.Group;
 import jp.fccpc.taskmanager.Values.Membership;
 import jp.fccpc.taskmanager.Values.Task;
 import jp.fccpc.taskmanager.Values.User;
+import jp.fccpc.taskmanager.Views.GroupList.GroupDetailActivity;
 
 public class TaskListFragment extends Fragment {
     // selected item position
@@ -43,6 +44,7 @@ public class TaskListFragment extends Fragment {
     private List<TaskListItem> finished_tasks;
 
     private Button mCreateTaskButton;
+    private Button mOpenDetailButton;
     private Button mCompleteTaskButton;
 
     private int checkedCounter = 0;
@@ -51,6 +53,7 @@ public class TaskListFragment extends Fragment {
     private boolean isMainLayout;
     private int myMembershipPosition;
     private Long myId;
+    private boolean isOwner;
 
     private LinearLayout mainLayout, waitingUserAcceptLayout, waitingGroupAcceptLayout;
 
@@ -213,6 +216,7 @@ public class TaskListFragment extends Fragment {
                 else { taskId = finished_tasks.get(i1).getId();}
 
                 intent.putExtra("taskId", taskId);
+                intent.putExtra("isOwner", isOwner);
                 startActivity(intent);
                 return true;
             }
@@ -235,7 +239,8 @@ public class TaskListFragment extends Fragment {
         });
 
         // 自分がオーナーの時のみタスク追加ボタンを出す (デフォルト: gone)
-        if (myId.equals(mGroup.getAdministratorId())) {
+        isOwner = myId.equals(mGroup.getAdministratorId());
+        if (isOwner) {
             mCreateTaskButton.setVisibility(View.VISIBLE);
         }
 
@@ -247,6 +252,16 @@ public class TaskListFragment extends Fragment {
             }
         });
         mCompleteTaskButton.setVisibility(View.INVISIBLE);
+
+        mOpenDetailButton = (Button) rootView.findViewById(R.id.open_group_detail_tasklist);
+        mOpenDetailButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getActivity(), GroupDetailActivity.class);
+                intent.putExtra("GroupId", mGroup.getGroupId());
+                startActivity(intent);
+            }
+        });
     }
 
     @Override
@@ -281,7 +296,7 @@ public class TaskListFragment extends Fragment {
                     }
 
                     mAdapter.notifyDataSetChanged();
-                } else{
+                } else {
                     // Todo: handle error
                     Toast.makeText(getActivity(), "タスクリストの更新に失敗しました", Toast.LENGTH_SHORT).show();
                 }
@@ -302,8 +317,13 @@ public class TaskListFragment extends Fragment {
         App.get().getTaskManager().finish(checkedIds, new TaskManager.Callback() {
             @Override
             public void callback(boolean success) {
-                endCheckMode();
-                updateTaskList();
+                if(success) {
+                    endCheckMode();
+                    updateTaskList();
+                } else {
+                    // Todo: handle error
+                    Toast.makeText(getActivity(), "タスクの更新に失敗しました", Toast.LENGTH_SHORT).show();
+                }
             }
         });
     }

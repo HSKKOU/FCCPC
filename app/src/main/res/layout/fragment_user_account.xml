@@ -10,6 +10,24 @@
 
     <TextView
         android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/abc_text_size_large_material"
+        android:text="@string/user_account"
+        />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:layout_marginEnd="5dp"
+        android:background="#22aa22"
+        >
+
+    </View>
+
+    <TextView
+        android:layout_width="match_parent"
         android:layout_height="25dp"
 
         android:id="@+id/change_name_title"

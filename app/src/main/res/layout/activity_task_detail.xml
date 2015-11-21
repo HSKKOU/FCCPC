@@ -8,97 +8,133 @@
     android:layout_margin="20dp"
     >
 
-    <GridLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:columnCount="2"
-        android:rowCount="4"
+        android:orientation="vertical"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
         >
 
-        <!--title-->
-        <TextView
-            android:text="@string/task_detail_title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_column="0"
-            android:layout_row="0"
-        />
-        <TextView
-            android:id="@+id/task_detail_input_title"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_column="1"
-            android:layout_row="0"
-            android:layout_marginLeft="50dp"
-            android:focusable="true"
-            android:focusableInTouchMode="true"
-            />
-
-        <!--deadline-->
-        <TextView
-            android:text="@string/task_detail_deadline"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_column="0"
-            android:layout_row="1"
-            />
-
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_column="1"
-            android:layout_row="1"
-            android:layout_marginLeft="50dp"
+            android:layout_marginBottom="5dp"
             >
+            <!--title-->
             <TextView
-                android:id="@+id/task_detail_input_deadline"
-                android:layout_width="wrap_content"
+                android:text="@string/task_detail_title"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textSize="@dimen/abc_text_size_title_material"
                 />
             <TextView
-                android:id="@+id/task_detail_input_remindertime"
-                android:layout_width="wrap_content"
+                android:id="@+id/task_detail_input_title"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="4"
+                android:layout_marginStart="40dp"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:textSize="@dimen/abc_text_size_title_material"
                 />
+
         </LinearLayout>
 
-        <!--content-->
-        <TextView
-            android:text="@string/task_detail_content"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_column="0"
-            android:layout_row="2"
-            />
-        <TextView
-            android:id="@+id/task_detail_input_content"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_column="1"
-            android:layout_row="2"
-            android:layout_marginLeft="50dp"
-            />
+            android:orientation="horizontal"
+            android:layout_marginBottom="5dp"
+            >
+            <!--deadline-->
+            <TextView
+                android:text="@string/task_detail_deadline"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                />
 
-        <!-- finished user list-->
-        <TextView
-            android:text="@string/task_detail_finished_user_list"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_column="0"
-            android:layout_row="3"
-            />
-        <TextView
-            android:id="@+id/task_detail_input_finished_user_list"
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="4"
+                android:orientation="horizontal"
+                android:layout_marginStart="40dp"
+                >
+                <TextView
+                    android:id="@+id/task_detail_input_deadline"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    />
+                <TextView
+                    android:id="@+id/task_detail_input_remindertime"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    />
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_column="1"
-            android:layout_row="3"
-            android:layout_marginLeft="50dp"
-            />
-    </GridLayout>
+            android:orientation="horizontal"
+            android:layout_marginBottom="5dp"
+            >
 
-    <!-- finished user list-->
+            <!--content-->
+            <TextView
+                android:text="@string/task_detail_content"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textSize="@dimen/abc_text_size_medium_material"
+                />
+
+            <ScrollView
+                android:layout_width="0dp"
+                android:layout_height="200dp"
+                android:layout_weight="4"
+                android:layout_marginStart="40dp"
+                android:fadeScrollbars="false"
+                >
+                <TextView
+                    android:id="@+id/task_detail_input_content"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/abc_text_size_medium_material"
+                    />
+            </ScrollView>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="5dp"
+            >
+            <!-- finished user list-->
+            <TextView
+                android:text="@string/task_detail_finished_user_list"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+
+                />
+            <TextView
+                android:id="@+id/task_detail_input_finished_user_list"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="4"
+                android:layout_marginStart="40dp"
+                />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
 
     <View
         android:layout_width="match_parent"

@@ -17,6 +17,7 @@
     <string name="create_group">+ 新規グループ作成</string>
 
     <!-- user account info fragment-->
+    <string name="user_account">ユーザーアカウント情報</string>
     <string name="change_username">ユーザー名を変更</string>
     <string name="change_email">メールアドレスを変更</string>
     <string name="change_password">パスワードを変更</string>
@@ -28,6 +29,7 @@
     <string name="task_list_waiting_group_accept_text">グループオーナの承認待ちです</string>
     <string name="task_complete_button">完了</string>
     <string name="task_add_button">+</string>
+    <string name="open_task_detail_button">グループ詳細</string>
 
     <string name="finished_task">完了したタスク</string>
     <string name="unfinished_task">未完了のタスク</string>
