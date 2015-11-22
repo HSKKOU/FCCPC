@@ -2,11 +2,14 @@ package jp.fccpc.taskmanager.Managers.impl;
 
 import android.content.Context;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import jp.fccpc.taskmanager.Managers.GroupManager;
 import jp.fccpc.taskmanager.Managers.UserManager;
 import jp.fccpc.taskmanager.SQLite.Controller.GroupDataController;
+import jp.fccpc.taskmanager.SQLite.Controller.MembershipDataController;
+import jp.fccpc.taskmanager.SQLite.Controller.UserDataController;
 import jp.fccpc.taskmanager.Server.EndPoint;
 import jp.fccpc.taskmanager.Server.Response;
 import jp.fccpc.taskmanager.Server.ServerConnector;
@@ -20,10 +23,12 @@ import jp.fccpc.taskmanager.Values.User;
  */
 public class GroupManagerImpl extends ManagerImpl implements GroupManager {
     private GroupDataController groupDataController;
+    private MembershipDataController membershipDataController;
 
     public GroupManagerImpl(Context context) {
         super(context);
         this.groupDataController = new GroupDataController(context);
+        this.membershipDataController = new MembershipDataController(context);
     }
 
     @Override
@@ -85,29 +90,22 @@ public class GroupManagerImpl extends ManagerImpl implements GroupManager {
     }
 
     @Override
-    public void search(String groupName, String adminName, final GroupListCallback callback) {
-        callback.callback(null);
-        return;
+    public void search(final String groupName, String adminName, final GroupListCallback callback) {
+        if (isOnline()) {
+            this.searchWithAdminName(adminName, new GroupListCallback() {
+                @Override
+                public void callback(List<Group> groupList) {
+                    List<Group> gList = new ArrayList<Group>();
+                    for(Group g : groupList) {
+                        if(groupName.equals(g.getName())) { gList.add(g); }
+                    }
 
-//        if (isOnline()) {
-//            ServerConnector sc = new ServerConnector(new ServerConnector.ServerConnectorDelegate() {
-//                @Override
-//                public void recieveResponse(String responseStr) {
-//                    List<Group> groupList = JsonParser.groups(responseStr);
-//                    for(Group g : groupList) { groupDataController.updateGroup(g); }
-//
-//                    callback.callback(groupList);
-//                }
-//            });
-//
-//            String endPoint = EndPoint.group(null);
-//            String method = ServerConnector.GET;
-//            String params = null;
-//
-//            sc.execute(endPoint, method, params, null);
-//        } else {
-//            callback.callback(null);
-//        }
+                    callback.callback(gList);
+                }
+            });
+        } else {
+            callback.callback(null);
+        }
     }
 
     @Override
@@ -153,6 +151,8 @@ public class GroupManagerImpl extends ManagerImpl implements GroupManager {
                     }
 
                     User u = userList.get(0);
+                    UserDataController udc = new UserDataController(context);
+                    udc.updateUser(u);
 
                     ServerConnector sc = new ServerConnector(context, new ServerConnector.ServerConnectorDelegate() {
                         @Override
@@ -188,6 +188,7 @@ public class GroupManagerImpl extends ManagerImpl implements GroupManager {
             ServerConnector sc = new ServerConnector(context, new ServerConnector.ServerConnectorDelegate() {
                 @Override
                 public void success(Response response) {
+                    groupDataController.createGroup(group);
                     createMemberships(group.getMemberships(), new Callback() {
                         @Override
                         public void callback(boolean success) {
@@ -214,11 +215,12 @@ public class GroupManagerImpl extends ManagerImpl implements GroupManager {
     }
 
     @Override
-    public void update(Group group, final Callback callback) {
+    public void update(final Group group, final Callback callback) {
         if (isOnline()) {
             ServerConnector sc = new ServerConnector(context, new ServerConnector.ServerConnectorDelegate() {
                 @Override
                 public void success(Response response) {
+                    groupDataController.updateGroup(group);
                     callback.callback(true);
                 }
 
@@ -240,11 +242,12 @@ public class GroupManagerImpl extends ManagerImpl implements GroupManager {
     }
 
     @Override
-    public void delete(Long groupId, final Callback callback) {
+    public void delete(final Long groupId, final Callback callback) {
         if (isOnline()) {
             ServerConnector sc = new ServerConnector(context, new ServerConnector.ServerConnectorDelegate() {
                 @Override
                 public void success(Response response) {
+                    groupDataController.deleteGroup(new Group(groupId, null, null, null, null));
                     callback.callback(true);
                 }
 
@@ -265,7 +268,7 @@ public class GroupManagerImpl extends ManagerImpl implements GroupManager {
     }
 
     @Override
-    public void createMembership(Membership membership, final Callback callback) {
+    public void createMembership(final Membership membership, final Callback callback) {
         if(membership.isGroupAgreed() && membership.isUserAgreed()) {
             callback.callback(false);
             return;
@@ -275,6 +278,7 @@ public class GroupManagerImpl extends ManagerImpl implements GroupManager {
             ServerConnector sc = new ServerConnector(context, new ServerConnector.ServerConnectorDelegate() {
                 @Override
                 public void success(Response response) {
+                    membershipDataController.createMembership(membership);
                     callback.callback(true);
                 }
 
@@ -324,11 +328,12 @@ public class GroupManagerImpl extends ManagerImpl implements GroupManager {
     }
 
     @Override
-    public void updateMembership(Membership membership, final Callback callback) {
+    public void updateMembership(final Membership membership, final Callback callback) {
         if (isOnline()) {
             ServerConnector sc = new ServerConnector(context, new ServerConnector.ServerConnectorDelegate() {
                 @Override
                 public void success(Response response) {
+                    membershipDataController.updateMembership(membership);
                     callback.callback(true);
                 }
 
@@ -351,11 +356,12 @@ public class GroupManagerImpl extends ManagerImpl implements GroupManager {
     }
 
     @Override
-    public void deleteMembership(Membership membership, final Callback callback) {
+    public void deleteMembership(final Membership membership, final Callback callback) {
         if (isOnline()) {
             ServerConnector sc = new ServerConnector(context, new ServerConnector.ServerConnectorDelegate() {
                 @Override
                 public void success(Response response) {
+                    membershipDataController.deleteMembership(membership);
                     callback.callback(true);
                 }
 

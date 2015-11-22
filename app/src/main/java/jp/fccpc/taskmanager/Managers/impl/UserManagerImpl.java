@@ -4,6 +4,7 @@ import android.content.Context;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.List;
 
 import jp.fccpc.taskmanager.Managers.UserManager;
 import jp.fccpc.taskmanager.SQLite.Controller.UserDataController;
@@ -82,7 +83,13 @@ public class UserManagerImpl extends ManagerImpl implements UserManager {
             ServerConnector sc = new ServerConnector(context ,new ServerConnector.ServerConnectorDelegate() {
                 @Override
                 public void success(Response response) {
-                    callback.callback(JsonParser.users(response.bodyJSON));
+                    List<User> uList = JsonParser.users(response.bodyJSON);
+                    if(uList != null && uList.size() != 0) {
+                        for(User u : uList) {
+                            userDataController.updateUser(u);
+                        }
+                    }
+                    callback.callback(uList);
                 }
 
                 @Override
@@ -128,11 +135,12 @@ public class UserManagerImpl extends ManagerImpl implements UserManager {
     }
 
     @Override
-    public void update(User user, final Callback callback) {
+    public void update(final User user, final Callback callback) {
         if (isOnline()) {
             ServerConnector sc = new ServerConnector(context, new ServerConnector.ServerConnectorDelegate() {
                 @Override
                 public void success(Response response) {
+                    userDataController.updateUser(user);
                     callback.callback(true);
                 }
 
