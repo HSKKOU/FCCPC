@@ -84,6 +84,9 @@ public class TaskDataController extends SQLiteDataController {
     public void deleteTask(Task task) {
         this.deleteModel(String.valueOf(task.getTaskId()));
     }
+    public void deleteTaskById(Long taskId) {
+        this.deleteModel(String.valueOf(taskId));
+    }
 
     public long updateTask(Task task) {
         ContentValues values = new ContentValues();

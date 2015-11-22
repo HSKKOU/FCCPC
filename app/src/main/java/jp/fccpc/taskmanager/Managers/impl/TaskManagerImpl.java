@@ -159,11 +159,12 @@ public class TaskManagerImpl extends ManagerImpl implements TaskManager {
     }
 
     @Override
-    public void create(Task task, final Callback callback) {
+    public void create(final Task task, final Callback callback) {
         if (isOnline()) {
             ServerConnector sc = new ServerConnector(context, new ServerConnector.ServerConnectorDelegate() {
                 @Override
                 public void success(Response response) {
+                    taskDataController.createTask(task);
                     callback.callback(true);
                 }
 
@@ -218,11 +219,12 @@ public class TaskManagerImpl extends ManagerImpl implements TaskManager {
     }
 
     @Override
-    public void update(Task task, final Callback callback) {
+    public void update(final Task task, final Callback callback) {
         if (isOnline()) {
             ServerConnector sc = new ServerConnector(context, new ServerConnector.ServerConnectorDelegate() {
                 @Override
                 public void success(Response response) {
+                    taskDataController.updateTask(task);
                     callback.callback(true);
                 }
 
@@ -250,11 +252,12 @@ public class TaskManagerImpl extends ManagerImpl implements TaskManager {
     }
 
     @Override
-    public void delete(Long taskId, final Callback callback) {
+    public void delete(final Long taskId, final Callback callback) {
         if (isOnline()) {
             ServerConnector sc = new ServerConnector(context, new ServerConnector.ServerConnectorDelegate() {
                 @Override
                 public void success(Response response) {
+                    taskDataController.deleteTaskById(taskId);
                     callback.callback(true);
                 }
 
