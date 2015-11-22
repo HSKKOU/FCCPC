@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.util.Log;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import java.util.ArrayList;
@@ -13,7 +12,6 @@ import java.util.List;
 
 import jp.fccpc.taskmanager.Managers.App;
 import jp.fccpc.taskmanager.Managers.GroupManager;
-import jp.fccpc.taskmanager.R;
 import jp.fccpc.taskmanager.Values.Group;
 import jp.fccpc.taskmanager.Views.TaskList.TaskListFragment;
 
@@ -51,8 +49,10 @@ public class GroupListFragment extends ListFragment {
      * selections.
      */
 
-    private ArrayAdapter<String> adapterGroup;
-    private List<String> GroupNames;
+    //private ArrayAdapter<String> adapterGroup;
+    // private List<String> GroupNames;
+    private GroupListAdapter adapterGroup;
+    private List<Group> groups;
 
     public interface Callbacks {
         /**
@@ -83,14 +83,16 @@ public class GroupListFragment extends ListFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        GroupNames = new ArrayList<>();
-        adapterGroup = new ArrayAdapter<String>(
-                getActivity(),
-                //android.R.layout.simple_expandable_list_item_1,
-                //android.R.layout.simple_list_item_activated_1,
-                R.layout.list_item_group,
-                R.id.group_list_item,
-                GroupNames);
+//        GroupNames = new ArrayList<>();
+//        adapterGroup = new ArrayAdapter<String>(
+//                getActivity(),
+//                //android.R.layout.simple_expandable_list_item_1,
+//                //android.R.layout.simple_list_item_activated_1,
+//                R.layout.list_item_group,
+//                R.id.group_list_item,
+//                GroupNames);
+        groups = new ArrayList<>();
+        adapterGroup = new GroupListAdapter(getActivity(), groups);
         setListAdapter(adapterGroup);
     }
 
@@ -160,16 +162,18 @@ public class GroupListFragment extends ListFragment {
         updateGroupList();
     }
 
-    private void updateGroupList(){
-        GroupNames.clear();
-
+    public void updateGroupList(){
         App.get().getGroupManager().getList(new GroupManager.GroupListCallback() {
             @Override
             public void callback(List<Group> groupList) {
                 if (groupList != null) {
-                    for (Group g : groupList) {
-                        GroupNames.add(g.getName());
-                    }
+//                    GroupNames.clear();
+//                    for (Group g : groupList) {
+//                        GroupNames.add(g.getName());
+//                    }
+
+                    groups.clear();
+                    groups.addAll(groupList);
 
                     adapterGroup.notifyDataSetChanged();
                 }

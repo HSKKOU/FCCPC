@@ -129,4 +129,9 @@ public class MainActivity extends AppCompatActivity
                 .replace(R.id.item_detail_container, fragment)
                 .commit();
     }
+
+    // called from TaskListFragment
+    public void updateGroupList(){
+        mGroupListFragment.updateGroupList();
+    }
 }

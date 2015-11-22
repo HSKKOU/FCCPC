@@ -15,7 +15,10 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
+import jp.fccpc.taskmanager.Managers.App;
+import jp.fccpc.taskmanager.Managers.TaskManager;
 import jp.fccpc.taskmanager.R;
+import jp.fccpc.taskmanager.Values.User;
 
 /**
  * Created by tm on 2015/11/19.
@@ -116,8 +119,23 @@ public class TaskListAdapter extends BaseExpandableListAdapter {
         TextView mRemainderDate = (TextView) childView.findViewById(R.id.date);
         mRemainderDate.setText(item.getDateString());
 
+        final TextView mFinishedUserNum = (TextView) childView.findViewById(R.id.finished_user_num);
+        // get finished user list
+        App.get().getTaskManager().getFinishedUserList(item.getId(), new TaskManager.UserListCallback() {
+            @Override
+            public void callback(List<User> userList) {
+                if (userList != null) {
+                    String s = "" + userList.size() + "人終了";
+                    mFinishedUserNum.setText(s);
+                } else {
+                    // Todo: handle error
+                }
+            }
+        });
+
         // チェックボックス
         CheckBox checkBox = (CheckBox) childView.findViewById(R.id.check_box);
+
         if(i == UNFINISHED_TASKS) {
             boolean beforeChecked = item.checked;
             checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -127,6 +145,9 @@ public class TaskListAdapter extends BaseExpandableListAdapter {
                 }
             });
             checkBox.setChecked(item.checked);
+            if(item.isNearDeadline()){
+                mRemainderDate.setTextColor(Color.RED);
+            }
         } else {
             mRemainderDate.setTextColor(Color.GRAY);
             mTitle.setTextColor(Color.GRAY);
