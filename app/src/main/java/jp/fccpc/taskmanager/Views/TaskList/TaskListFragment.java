@@ -1,5 +1,6 @@
 package jp.fccpc.taskmanager.Views.TaskList;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -27,6 +28,7 @@ import jp.fccpc.taskmanager.Values.Membership;
 import jp.fccpc.taskmanager.Values.Task;
 import jp.fccpc.taskmanager.Values.User;
 import jp.fccpc.taskmanager.Views.GroupList.GroupDetailActivity;
+import jp.fccpc.taskmanager.Views.MainActivity;
 
 public class TaskListFragment extends Fragment {
     // selected item position
@@ -179,7 +181,7 @@ public class TaskListFragment extends Fragment {
                             App.get().getGroupManager().update(g, new GroupManager.Callback() {
                                 @Override
                                 public void callback(boolean success) {
-                                    if(success) {
+                                    if (success) {
                                         // レイアウトを変更
                                         waitingUserAcceptLayout.setVisibility(View.GONE);
                                         mainLayout.setVisibility(View.VISIBLE);
@@ -238,11 +240,6 @@ public class TaskListFragment extends Fragment {
             }
         });
 
-        // 自分がオーナーの時のみタスク追加ボタンを出す (デフォルト: gone)
-        isOwner = myId.equals(mGroup.getAdministratorId());
-        if (isOwner) {
-            mCreateTaskButton.setVisibility(View.VISIBLE);
-        }
 
         mCompleteTaskButton = (Button) rootView.findViewById(R.id.complete_task_button_tasklist);
         mCompleteTaskButton.setOnClickListener(new View.OnClickListener() {
@@ -252,6 +249,12 @@ public class TaskListFragment extends Fragment {
             }
         });
         mCompleteTaskButton.setVisibility(View.INVISIBLE);
+
+        // 自分がオーナーの時のみタスク追加ボタンを出す (デフォルト: gone)
+        isOwner = myId.equals(mGroup.getAdministratorId());
+        if (isOwner) {
+            mCreateTaskButton.setVisibility(View.VISIBLE);
+        }
 
         mOpenDetailButton = (Button) rootView.findViewById(R.id.open_group_detail_tasklist);
         mOpenDetailButton.setOnClickListener(new View.OnClickListener() {
@@ -317,9 +320,11 @@ public class TaskListFragment extends Fragment {
         App.get().getTaskManager().finish(checkedIds, new TaskManager.Callback() {
             @Override
             public void callback(boolean success) {
-                if(success) {
+                if (success) {
                     endCheckMode();
                     updateTaskList();
+
+                    ((MainActivity) mActivity).updateGroupList();
                 } else {
                     // Todo: handle error
                     Toast.makeText(getActivity(), "タスクの更新に失敗しました", Toast.LENGTH_SHORT).show();
@@ -353,4 +358,10 @@ public class TaskListFragment extends Fragment {
         mCompleteTaskButton.setVisibility(View.INVISIBLE);
     }
 
+    private Activity mActivity;
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        mActivity = activity;
+    }
 }

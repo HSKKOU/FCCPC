@@ -162,7 +162,7 @@ public class GroupListFragment extends ListFragment {
         updateGroupList();
     }
 
-    private void updateGroupList(){
+    public void updateGroupList(){
         App.get().getGroupManager().getList(new GroupManager.GroupListCallback() {
             @Override
             public void callback(List<Group> groupList) {

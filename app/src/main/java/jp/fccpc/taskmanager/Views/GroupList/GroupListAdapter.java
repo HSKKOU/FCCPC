@@ -1,6 +1,7 @@
 package jp.fccpc.taskmanager.Views.GroupList;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -52,6 +53,7 @@ public class GroupListAdapter extends ArrayAdapter<Group> {
 
         groupNmae.setText(g.getName());
 
+        // Todo: 冗長なので改善する
         App.get().getTaskManager().getList(g.getGroupId(), new TaskManager.TaskListCallback() {
             @Override
             public void callback(List<Task> taskList) {
@@ -64,8 +66,11 @@ public class GroupListAdapter extends ArrayAdapter<Group> {
                         }
                     }
 
+                    Log.d("grouplistadapter", "" + i);
                     if (i != 0) {
                         unfinishedTaskNum.setText(Integer.toString(i));
+                    } else {
+                        unfinishedTaskNum.setText("");
                     }
 
                 } else {

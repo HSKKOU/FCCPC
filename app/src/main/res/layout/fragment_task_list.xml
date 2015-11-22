@@ -40,7 +40,8 @@
                 android:id="@+id/complete_task_button_tasklist"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="30dp"
+                android:layout_marginEnd="100dp"
+                android:layout_alignParentEnd="true"
                 android:layout_toStartOf="@+id/create_task_button_tasklist"
                 android:text="@string/task_complete_button"
                 />

@@ -118,6 +118,7 @@ public class TaskListAdapter extends BaseExpandableListAdapter {
 
         // チェックボックス
         CheckBox checkBox = (CheckBox) childView.findViewById(R.id.check_box);
+
         if(i == UNFINISHED_TASKS) {
             boolean beforeChecked = item.checked;
             checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -127,6 +128,9 @@ public class TaskListAdapter extends BaseExpandableListAdapter {
                 }
             });
             checkBox.setChecked(item.checked);
+            if(item.isNearDeadline()){
+                mRemainderDate.setTextColor(Color.RED);
+            }
         } else {
             mRemainderDate.setTextColor(Color.GRAY);
             mTitle.setTextColor(Color.GRAY);
