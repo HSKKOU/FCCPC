@@ -284,6 +284,11 @@ public class GroupManagerMock implements GroupManager {
     }
 
     @Override
+    public void getMembership(Long groupId, Long userId, MembershipCallback callback) {
+        
+    }
+
+    @Override
     public void updateMembership(Membership membership, Callback callback) {
 
     }

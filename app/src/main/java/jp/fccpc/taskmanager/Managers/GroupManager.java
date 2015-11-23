@@ -12,6 +12,7 @@ public interface GroupManager {
     interface Callback { void callback(boolean success); }
     interface GroupCallback { void callback(Group group); }
     interface GroupListCallback { void callback(List<Group> groupList); }
+    interface MembershipCallback { void callback(Membership membership); }
 
     void getList(GroupListCallback callback);
 
@@ -32,6 +33,8 @@ public interface GroupManager {
     void createMembership(Membership membership, Callback callback);
 
     void createMemberships(List<Membership> memberships, Callback callback);
+
+    void getMembership(Long groupId, Long userId, MembershipCallback callback);
 
     void updateMembership(Membership membership, Callback callback);
 
