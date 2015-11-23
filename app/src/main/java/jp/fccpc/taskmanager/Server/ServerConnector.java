@@ -13,6 +13,8 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.List;
+import java.util.Map;
 
 import jp.fccpc.taskmanager.SQLite.Controller.UserDataController;
 
@@ -109,13 +111,18 @@ public class ServerConnector extends AsyncTask<String, Integer, Response> {
         InputStream is = con.getInputStream();
         BufferedReader br = new BufferedReader(new InputStreamReader(is, CHAR_SET));
 
-//        Map<String,List<String>> headers = con.getHeaderFields();
-//        for(String key : headers.keySet()) {
-//            Log.d(TAG, "key: " + key + ", value: " + headers.get(key));
-//        }
+        Map<String,List<String>> headers = con.getHeaderFields();
+        for(String key : headers.keySet()) {
+            Log.d(TAG, "key: " + key + ", value: " + headers.get(key));
+        }
+
+        String eTag = null;
+
+        eTag = con.getHeaderField("Etag");
+        Log.d(TAG, "Etag: " + eTag);
 
         // TODO: implement ETag
-        return new Response(this.buf2str(br), "ETag");
+        return new Response(this.buf2str(br), eTag);
     }
 
     private Response failResponse(HttpURLConnection con) throws IOException {
