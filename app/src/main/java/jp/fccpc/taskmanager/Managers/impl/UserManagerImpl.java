@@ -5,6 +5,7 @@ import android.util.Log;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.List;
 
 import jp.fccpc.taskmanager.Managers.UserManager;
@@ -86,12 +87,10 @@ public class UserManagerImpl extends ManagerImpl implements UserManager {
             ServerConnector sc = new ServerConnector(context ,new ServerConnector.ServerConnectorDelegate() {
                 @Override
                 public void success(Response response) {
-                    List<User> uList = JsonParser.users(response.bodyJSON);
-                    if(uList != null && uList.size() != 0) {
-                        for(User u : uList) {
-                            userDataController.updateUser(u);
-                        }
-                    }
+                    List<User> uList = new ArrayList<User>();
+                    User u = JsonParser.user(response.bodyJSON);
+                    if(u == null) {uList.add(u);}
+
                     callback.callback(uList);
                 }
 

@@ -100,6 +100,21 @@ public class JsonParser {
 
         return userList;
     }
+    static public User user(String json) {
+        User user = null;
+
+        JSONObject jo = str2JsonObject(json);
+
+        if(jo == null) { return null; }
+
+        user = new User(
+                getLongJSON(jo, "id"),
+                getStringJSON(jo, "name"),
+                getStringJSON(jo, "email_address")
+        );
+
+        return user;
+    }
     static public List<Membership> memberships(String json, String eTag) {
         List<Membership> memberList = new ArrayList<Membership>();
 

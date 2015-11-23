@@ -10,7 +10,6 @@ import jp.fccpc.taskmanager.Managers.GroupManager;
 import jp.fccpc.taskmanager.Managers.UserManager;
 import jp.fccpc.taskmanager.SQLite.Controller.GroupDataController;
 import jp.fccpc.taskmanager.SQLite.Controller.MembershipDataController;
-import jp.fccpc.taskmanager.SQLite.Controller.UserDataController;
 import jp.fccpc.taskmanager.Server.EndPoint;
 import jp.fccpc.taskmanager.Server.Response;
 import jp.fccpc.taskmanager.Server.ServerConnector;
@@ -162,17 +161,11 @@ public class GroupManagerImpl extends ManagerImpl implements GroupManager {
                     }
 
                     User u = userList.get(0);
-                    UserDataController udc = new UserDataController(context);
-                    udc.updateUser(u);
 
                     ServerConnector sc = new ServerConnector(context, new ServerConnector.ServerConnectorDelegate() {
                         @Override
                         public void success(Response response) {
                             List<Group> groupList = JsonParser.groups(response.bodyJSON, response.ETag);
-                            for (Group g : groupList) {
-                                groupDataController.updateGroup(g);
-                            }
-
                             callback.callback(groupList);
                         }
 
