@@ -105,8 +105,10 @@ public class GroupManagerImpl extends ManagerImpl implements GroupManager {
                 @Override
                 public void callback(List<Group> groupList) {
                     List<Group> gList = new ArrayList<Group>();
-                    for(Group g : groupList) {
-                        if(groupName.equals(g.getName())) { gList.add(g); }
+                    for (Group g : groupList) {
+                        if (groupName.equals(g.getName())) {
+                            gList.add(g);
+                        }
                     }
 
                     callback.callback(gList);
@@ -154,7 +156,7 @@ public class GroupManagerImpl extends ManagerImpl implements GroupManager {
             um.searchUser(adminName, new UserManager.UserListCallback() {
                 @Override
                 public void callback(List<User> userList) {
-                    if(userList == null || userList.size() == 0) {
+                    if (userList == null || userList.size() == 0) {
                         callback.callback(null);
                         return;
                     }
@@ -167,7 +169,9 @@ public class GroupManagerImpl extends ManagerImpl implements GroupManager {
                         @Override
                         public void success(Response response) {
                             List<Group> groupList = JsonParser.groups(response.bodyJSON, response.ETag);
-                            for (Group g : groupList) {groupDataController.updateGroup(g);}
+                            for (Group g : groupList) {
+                                groupDataController.updateGroup(g);
+                            }
 
                             callback.callback(groupList);
                         }
@@ -214,8 +218,8 @@ public class GroupManagerImpl extends ManagerImpl implements GroupManager {
 
             String endPoint = EndPoint.group(null);
             String method = ServerConnector.POST;
-            String params = makeParamsString(new String []{"name"},
-                    new String[] {group.getName()});
+            String params = makeParamsString(new String[]{"name"},
+                    new String[]{group.getName()});
 
             sc.execute(endPoint, method, params, null);
         } else {
@@ -348,6 +352,32 @@ public class GroupManagerImpl extends ManagerImpl implements GroupManager {
                     }
                 }
             });
+        }
+    }
+
+    @Override
+    public void getMembership(Long groupId, Long userId, final MembershipCallback callback) {
+        if (isOnline()) {
+            ServerConnector sc = new ServerConnector(context, new ServerConnector.ServerConnectorDelegate() {
+                @Override
+                public void success(Response response) {
+                    Membership m = JsonParser.memberships(response.bodyJSON, response.ETag).get(0);
+                    callback.callback(m);
+                }
+
+                @Override
+                public void failure(Response response) {
+                    callback.callback(null);
+                }
+            });
+
+            String endPoint = EndPoint.membership(groupId, userId);
+            String method = ServerConnector.GET;
+            String params = null;
+
+            sc.execute(endPoint, method, params, null);
+        } else {
+            callback.callback(this.membershipDataController.getMembership(groupId, userId));
         }
     }
 
