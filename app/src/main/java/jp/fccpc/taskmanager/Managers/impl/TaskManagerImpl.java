@@ -1,6 +1,7 @@
 package jp.fccpc.taskmanager.Managers.impl;
 
 import android.content.Context;
+import android.util.Log;
 
 import java.util.List;
 
@@ -17,6 +18,8 @@ import jp.fccpc.taskmanager.Values.Task;
  * Created by Shunta on 10/22/15.
  */
 public class TaskManagerImpl extends ManagerImpl implements TaskManager {
+    private static final String TAG = TaskManagerImpl.class.getSimpleName();
+
     private TaskDataController taskDataController;
 
     public TaskManagerImpl(Context context) {
@@ -160,11 +163,16 @@ public class TaskManagerImpl extends ManagerImpl implements TaskManager {
 
     @Override
     public void create(final Task task, final Callback callback) {
+        if(task == null) {
+            Log.d(TAG, "cannot create null task");
+            callback.callback(false);
+            return;
+        }
+
         if (isOnline()) {
             ServerConnector sc = new ServerConnector(context, new ServerConnector.ServerConnectorDelegate() {
                 @Override
                 public void success(Response response) {
-                    taskDataController.createTask(task);
                     callback.callback(true);
                 }
 
@@ -193,6 +201,12 @@ public class TaskManagerImpl extends ManagerImpl implements TaskManager {
 
     @Override
     public void createBoardItem(Long taskId, BoardItem boardItem, final Callback callback) {
+        if(boardItem == null) {
+            Log.d(TAG, "cannot create null boardItem");
+            callback.callback(false);
+            return;
+        }
+
         if (isOnline()) {
             ServerConnector sc = new ServerConnector(context, new ServerConnector.ServerConnectorDelegate() {
                 @Override
@@ -220,11 +234,16 @@ public class TaskManagerImpl extends ManagerImpl implements TaskManager {
 
     @Override
     public void update(final Task task, final Callback callback) {
+        if(task == null || task.getETag() == null) {
+            Log.d(TAG, "cannot update null task or null eTag");
+            callback.callback(false);
+            return;
+        }
+
         if (isOnline()) {
             ServerConnector sc = new ServerConnector(context, new ServerConnector.ServerConnectorDelegate() {
                 @Override
                 public void success(Response response) {
-                    taskDataController.updateTask(task);
                     callback.callback(true);
                 }
 
@@ -244,8 +263,9 @@ public class TaskManagerImpl extends ManagerImpl implements TaskManager {
                             Long.toString(task.getDeadline()),
                             task.getDetail()
                     });
+            String eTag = task.getETag();
 
-            sc.execute(endPoint, method, params, null);
+            sc.execute(endPoint, method, params, eTag);
         } else {
             callback.callback(false);
         }
@@ -253,6 +273,13 @@ public class TaskManagerImpl extends ManagerImpl implements TaskManager {
 
     @Override
     public void delete(final Long taskId, final Callback callback) {
+        Task taskFromDB = taskDataController.getTask(taskId);
+        if(taskFromDB == null || taskFromDB.getETag() == null) {
+            Log.d(TAG, "cannot delete null task or null eTag");
+            callback.callback(false);
+            return;
+        }
+
         if (isOnline()) {
             ServerConnector sc = new ServerConnector(context, new ServerConnector.ServerConnectorDelegate() {
                 @Override
@@ -270,8 +297,9 @@ public class TaskManagerImpl extends ManagerImpl implements TaskManager {
             String endPoint = EndPoint.task(taskId);
             String method = ServerConnector.DELETE;
             String params = "";
+            String eTag = taskFromDB.getETag();
 
-            sc.execute(endPoint, method, params, null);
+            sc.execute(endPoint, method, params, eTag);
         } else {
             callback.callback(false);
         }

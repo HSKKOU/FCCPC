@@ -1,6 +1,7 @@
 package jp.fccpc.taskmanager.Managers.impl;
 
 import android.content.Context;
+import android.util.Log;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -18,6 +19,8 @@ import jp.fccpc.taskmanager.Values.User;
  * Created by Shunta on 10/22/15.
  */
 public class UserManagerImpl extends ManagerImpl implements UserManager {
+    private static final String TAG = UserManagerImpl.class.getSimpleName();
+
     static private final String NAME_KEY = "name";
     static private final String EMAIL_KEY = "email_address";
     static private final String OLD_PASSWORD_KEY = "old_password";
@@ -110,6 +113,12 @@ public class UserManagerImpl extends ManagerImpl implements UserManager {
 
     @Override
     public void create(User user, String password, final Callback callback) {
+        if(user == null || password == null) {
+            Log.d(TAG, "cannot create null user or password");
+            callback.callback(false);
+            return;
+        }
+
         if (isOnline()) {
             ServerConnector sc = new ServerConnector(context, new ServerConnector.ServerConnectorDelegate() {
                 @Override
@@ -136,11 +145,16 @@ public class UserManagerImpl extends ManagerImpl implements UserManager {
 
     @Override
     public void update(final User user, final Callback callback) {
+        if(user == null) {
+            Log.d(TAG, "cannot update null user");
+            callback.callback(false);
+            return;
+        }
+
         if (isOnline()) {
             ServerConnector sc = new ServerConnector(context, new ServerConnector.ServerConnectorDelegate() {
                 @Override
                 public void success(Response response) {
-                    userDataController.updateUser(user);
                     callback.callback(true);
                 }
 
@@ -163,6 +177,12 @@ public class UserManagerImpl extends ManagerImpl implements UserManager {
 
     @Override
     public void updatePassword(String oldPassword, String newPassword, final Callback callback) {
+        if(oldPassword == null || newPassword == null) {
+            Log.d(TAG, "cannot update null password");
+            callback.callback(false);
+            return;
+        }
+
         if (isOnline()) {
             ServerConnector sc = new ServerConnector(context, new ServerConnector.ServerConnectorDelegate() {
                 @Override

@@ -1,6 +1,7 @@
 package jp.fccpc.taskmanager.Managers.impl;
 
 import android.content.Context;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +23,8 @@ import jp.fccpc.taskmanager.Values.User;
  * Created by Shunta on 10/22/15.
  */
 public class GroupManagerImpl extends ManagerImpl implements GroupManager {
+    private static final String TAG = GroupManagerImpl.class.getSimpleName();
+
     private GroupDataController groupDataController;
     private MembershipDataController membershipDataController;
 
@@ -40,6 +43,9 @@ public class GroupManagerImpl extends ManagerImpl implements GroupManager {
                     List<Group> groupList = JsonParser.groups(response.bodyJSON, response.ETag);
                     for (Group g : groupList) {
                         groupDataController.updateGroup(g);
+                        for(Membership m : g.getMemberships()) {
+                            membershipDataController.updateMembership(m);
+                        }
                     }
 
                     callback.callback(groupList);
@@ -69,6 +75,9 @@ public class GroupManagerImpl extends ManagerImpl implements GroupManager {
                 public void success(Response response) {
                     Group g = JsonParser.groups(response.bodyJSON, response.ETag).get(0);
                     groupDataController.updateGroup(g);
+                    for(Membership m : g.getMemberships()) {
+                        membershipDataController.updateMembership(m);
+                    }
 
                     callback.callback(g);
                 }
@@ -184,17 +193,17 @@ public class GroupManagerImpl extends ManagerImpl implements GroupManager {
 
     @Override
     public void create(final Group group, final Callback callback) {
+        if(group == null) {
+            Log.d(TAG, "cannot create null group");
+            callback.callback(false);
+            return;
+        }
+
         if (isOnline()) {
             ServerConnector sc = new ServerConnector(context, new ServerConnector.ServerConnectorDelegate() {
                 @Override
                 public void success(Response response) {
-                    groupDataController.createGroup(group);
-                    createMemberships(group.getMemberships(), new Callback() {
-                        @Override
-                        public void callback(boolean success) {
-                            callback.callback(success);
-                        }
-                    });
+                    callback.callback(true);
                 }
 
                 @Override
@@ -216,11 +225,16 @@ public class GroupManagerImpl extends ManagerImpl implements GroupManager {
 
     @Override
     public void update(final Group group, final Callback callback) {
+        if(group == null || group.getETag() == null) {
+            Log.d(TAG, "cannot update null group or null eTag");
+            callback.callback(false);
+            return;
+        }
+
         if (isOnline()) {
             ServerConnector sc = new ServerConnector(context, new ServerConnector.ServerConnectorDelegate() {
                 @Override
                 public void success(Response response) {
-                    groupDataController.updateGroup(group);
                     callback.callback(true);
                 }
 
@@ -234,8 +248,9 @@ public class GroupManagerImpl extends ManagerImpl implements GroupManager {
             String method = ServerConnector.PUT;
             String params = makeParamsString(new String []{"name"},
                     new String[] {group.getName()});
+            String eTag = group.getETag();
 
-            sc.execute(endPoint, method, params, null);
+            sc.execute(endPoint, method, params, eTag);
         } else {
             callback.callback(false);
         }
@@ -243,11 +258,18 @@ public class GroupManagerImpl extends ManagerImpl implements GroupManager {
 
     @Override
     public void delete(final Long groupId, final Callback callback) {
+        Group groupFromDB = groupDataController.getGroup(groupId);
+        if(groupFromDB == null || groupFromDB.getETag() == null) {
+            Log.d(TAG, "cannot delete null group or null eTag");
+            callback.callback(false);
+            return;
+        }
+
         if (isOnline()) {
             ServerConnector sc = new ServerConnector(context, new ServerConnector.ServerConnectorDelegate() {
                 @Override
                 public void success(Response response) {
-                    groupDataController.deleteGroup(new Group(groupId, null, null, null, null));
+                    groupDataController.deleteGroupById(groupId);
                     callback.callback(true);
                 }
 
@@ -260,8 +282,9 @@ public class GroupManagerImpl extends ManagerImpl implements GroupManager {
             String endPoint = EndPoint.group(groupId);
             String method = ServerConnector.DELETE;
             String params = null;
+            String eTag = groupFromDB.getETag();
 
-            sc.execute(endPoint, method, params, null);
+            sc.execute(endPoint, method, params, eTag);
         } else {
             callback.callback(false);
         }
@@ -270,6 +293,7 @@ public class GroupManagerImpl extends ManagerImpl implements GroupManager {
     @Override
     public void createMembership(final Membership membership, final Callback callback) {
         if(membership.isGroupAgreed() && membership.isUserAgreed()) {
+            Log.d(TAG, "cannot create membership both true");
             callback.callback(false);
             return;
         }
@@ -278,7 +302,6 @@ public class GroupManagerImpl extends ManagerImpl implements GroupManager {
             ServerConnector sc = new ServerConnector(context, new ServerConnector.ServerConnectorDelegate() {
                 @Override
                 public void success(Response response) {
-                    membershipDataController.createMembership(membership);
                     callback.callback(true);
                 }
 
@@ -306,7 +329,8 @@ public class GroupManagerImpl extends ManagerImpl implements GroupManager {
     private int finished = 0;
     @Override
     public void createMemberships(List<Membership> memberships, final Callback callback) {
-        if(memberships.size() == 0) {
+        if(memberships == null || memberships.size() == 0) {
+            Log.d(TAG, "cannot create null memberships");
             callback.callback(true);
             return;
         }
@@ -329,11 +353,16 @@ public class GroupManagerImpl extends ManagerImpl implements GroupManager {
 
     @Override
     public void updateMembership(final Membership membership, final Callback callback) {
+        if(membership == null || membership.getETag() == null) {
+            Log.d(TAG, "cannot update null membership or null eTag");
+            callback.callback(false);
+            return;
+        }
+
         if (isOnline()) {
             ServerConnector sc = new ServerConnector(context, new ServerConnector.ServerConnectorDelegate() {
                 @Override
                 public void success(Response response) {
-                    membershipDataController.updateMembership(membership);
                     callback.callback(true);
                 }
 
@@ -348,8 +377,9 @@ public class GroupManagerImpl extends ManagerImpl implements GroupManager {
             String params = makeParamsString(
                     new String[]{"group_agreed", "user_agreed"},
                     new String[]{String.valueOf(membership.isGroupAgreed()), String.valueOf(membership.isUserAgreed())});
+            String eTag = membership.getETag();
 
-            sc.execute(endPoint, method, params, null);
+            sc.execute(endPoint, method, params, eTag);
         } else {
             callback.callback(false);
         }
@@ -357,6 +387,12 @@ public class GroupManagerImpl extends ManagerImpl implements GroupManager {
 
     @Override
     public void deleteMembership(final Membership membership, final Callback callback) {
+        if(membership == null || membership.getETag() == null) {
+            Log.d(TAG, "cannot delete null membership or null eTag");
+            callback.callback(false);
+            return;
+        }
+
         if (isOnline()) {
             ServerConnector sc = new ServerConnector(context, new ServerConnector.ServerConnectorDelegate() {
                 @Override
@@ -374,8 +410,9 @@ public class GroupManagerImpl extends ManagerImpl implements GroupManager {
             String endPoint = EndPoint.membership(membership.getGroupId(), membership.getUserId());
             String method = ServerConnector.DELETE;
             String params = null;
+            String eTag = membership.getETag();
 
-            sc.execute(endPoint, method, params, null);
+            sc.execute(endPoint, method, params, eTag);
         } else {
             callback.callback(false);
         }

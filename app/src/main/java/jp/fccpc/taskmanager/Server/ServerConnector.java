@@ -48,6 +48,8 @@ public class ServerConnector extends AsyncTask<String, Integer, Response> {
 
     private ServerConnectorDelegate delegate;
 
+    private boolean shouldSetToken = false;
+
     // for Debug
     public ServerConnector(ServerConnectorDelegate delegate) {
         this.delegate = delegate;
@@ -121,7 +123,7 @@ public class ServerConnector extends AsyncTask<String, Integer, Response> {
 //        BufferedReader br = new BufferedReader(new InputStreamReader(errIS, CHAR_SET));
 //        return this.buf2str(br);
         // TODO: error handlers
-        return new Response("err", null);
+        return new Response("err: " + con.getResponseCode(), null);
     }
 
     private String buf2str(BufferedReader br) throws IOException {
@@ -137,7 +139,7 @@ public class ServerConnector extends AsyncTask<String, Integer, Response> {
         // set header's property
         con.setRequestProperty("Accept-Language", CHAR_SET);
         String token = this.getTokenFromSQL();
-        if(token != null && !"".equals(token)) { con.setRequestProperty("Authorization", "Token " + token); }
+        if(this.shouldSetToken && token != null && !"".equals(token)) { con.setRequestProperty("Authorization", "Token " + token); }
         if(this.eTag != null && !"".equals(this.eTag)) { con.setRequestProperty("If-Match", "ETag " + this.eTag); }
     }
 
@@ -161,6 +163,9 @@ public class ServerConnector extends AsyncTask<String, Integer, Response> {
 
         this.eTag = eTag;
 
+        this.shouldSetToken = !EndPoint.login().equals(endPointStr) && (!"user".equals(endPointStr) || !POST.equals(methodStr));
+        Log.d(TAG, "token: " + this.shouldSetToken);
+
         try {
             String urlStr = API_BASE_URL + endPointStr;
             HttpURLConnection con = null;
@@ -173,9 +178,7 @@ public class ServerConnector extends AsyncTask<String, Integer, Response> {
                 Log.d(TAG, "method is wrong");
             }
 
-            if (con == null) {
-                return null;
-            }
+            if (con == null) {return null;}
 
             return this.decodeResponse(con);
         } catch (IOException e) {
@@ -187,12 +190,10 @@ public class ServerConnector extends AsyncTask<String, Integer, Response> {
 
     @Override
     protected void onPostExecute(Response r) {
-        if(r != null) Log.d(TAG, r.toString());
+        if(r != null) {Log.d(TAG, r.toString());}
+        else {r = new Response("err: response null", null);}
 
-        if("err".equals(r.bodyJSON)) {
-            this.delegate.failure(r);
-        } else {
-            this.delegate.success(r);
-        }
+        if(r.bodyJSON.indexOf("err") != -1) {this.delegate.failure(r);}
+        else {this.delegate.success(r);}
     }
 }

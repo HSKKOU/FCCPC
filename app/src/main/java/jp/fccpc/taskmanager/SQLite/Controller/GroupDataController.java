@@ -88,12 +88,18 @@ public class GroupDataController extends SQLiteDataController {
     }
 
     public void deleteGroup(Group group) {
-        this.deleteModel(String.valueOf(group.getGroupId()));
-        List<Membership> mList = this.mdc.getMembershipsByGroupId(group.getGroupId());
+        this.deleteGroupById(group.getGroupId());
+    }
+
+    public void deleteGroupById(Long groupId) {
+        if(groupId == null) {return;}
+        this.deleteModel(String.valueOf(groupId));
+        List<Membership> mList = this.mdc.getMembershipsByGroupId(groupId);
         for(Membership m : mList) {
             this.mdc.deleteMembership(m);
         }
     }
+
 
     public long updateGroup(Group group) {
         ContentValues values = new ContentValues();
